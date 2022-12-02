@@ -105,7 +105,9 @@ zstyle ':omz:update' mode auto      # update automatically without asking
 plugins=(git 
         web-search
         dirhistory
-        sudo)
+        sudo
+	zsh-syntax-highlighting
+	zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -137,8 +139,6 @@ source $ZSH/oh-my-zsh.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /Users/josh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND='red'
 POWERLEVEL9K_BATTERY_CHARGED_FOREGROUND='blue'
@@ -151,20 +151,18 @@ alias cls="clear"
 
 test -e /Users/josh/.iterm2_shell_integration.zsh && source /Users/josh/.iterm2_shell_integration.zsh || true
 
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/josh/opt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/Users/josh/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/Users/josh/opt/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/josh/opt/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/Users/josh/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/Users/josh/miniconda/etc/profile.d/conda.sh"
     else
-        export PATH="/Users/josh/opt/miniconda3/bin:$PATH"
+        export PATH="/Users/josh/miniconda/bin:$PATH"
     fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-
-export PATH="/Users/josh/.deta/bin:$PATH"
