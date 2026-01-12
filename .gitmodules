@@ -10,3 +10,6 @@
 [submodule "zsh/oh-my-zsh-custom/custom/plugins/nix-shell"]
 	path = zsh/oh-my-zsh-custom/custom/plugins/nix-shell
 	url = https://github.com/chisui/zsh-nix-shell.git
+[submodule ".oh-my-zsh/custom/plugins/zsh-vi-mode"]
+	path = .oh-my-zsh/custom/plugins/zsh-vi-mode
+	url = https://github.com/jeffreytse/zsh-vi-mode
