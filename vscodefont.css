@@ -1,0 +1,19 @@
+.label-name,
+.pane-header,
+.search-label,
+.monaco-dropdown,
+.composite.title,
+.notification-toast,
+.quick-input-header,
+.statusbar-item-label,
+.monaco-highlighted-label,
+.scm-input *:not(.codicon),
+.monaco-scrollable-element,
+.shadow-root-host, .shadow-root-host *,
+.suggest-input-container *:not(.codicon),
+.menubar-menu-title:not(.toolbar-toggle-more),
+.monaco-dialog-box *:not(.codicon):not(.codicon *),
+.chat-input-container *:not(.chat-attachments-container):not(.chat-attachments-container *):not(.codicon):not(.codicon *) {
+	/* font-family: "Iosevka Kanade", "Jetbrains Mono", "Fira Code", "Menlo", "Consolas", monospace; */
+	font-family: 'SUSE', 'Sofia Pro', 'Figtree', 'DM Sans', 'Ubuntu', sans-serif;
+}

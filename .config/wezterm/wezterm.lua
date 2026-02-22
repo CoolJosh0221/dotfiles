@@ -66,4 +66,6 @@ config.ssh_domains = {
 	},
 }
 
+config.alternate_buffer_wheel_scroll_speed = 2
+
 return config

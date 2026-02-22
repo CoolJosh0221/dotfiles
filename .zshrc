@@ -70,7 +70,7 @@ zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+export ZSH_CUSTOM=$HOME/dotfiles/.oh-my-zsh/custom
 
 # Plugins
 plugins=(git dirhistory sudo zsh-syntax-highlighting zsh-autosuggestions shellfirm zsh-vi-mode)
@@ -118,7 +118,5 @@ zstyle ':completion:*:*:docker-*:*' option-stacking yes
 if [ "$(uname)" = "Darwin" ]; then
     source "$HOME/environment-macos-arm64.zsh"
 fi
-export MODULAR_HOME="/Users/josh/.modular"
-export PATH="/Users/josh/.modular/pkg/packages.modular.com_max/bin:$PATH"
 
 . "$HOME/.cargo/env"
