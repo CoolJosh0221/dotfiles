@@ -13,7 +13,7 @@ config.initial_cols = 120
 config.initial_rows = 28
 
 -- or, changing the font size and color scheme.
-config.font_size = 14
+config.font_size = 13
 config.color_scheme = "tokyonight_moon"
 config.window_decorations = "RESIZE"
 
@@ -29,8 +29,8 @@ config.font = wezterm.font_with_fallback({
 	chinese_font,
 })
 
-config.window_background_opacity = 0.96
-config.macos_window_background_blur = 10
+config.window_background_opacity = 0.92
+config.macos_window_background_blur = 20
 config.enable_scroll_bar = true
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = true
@@ -38,6 +38,7 @@ config.colors = {
 	cursor_bg = "#7aa2f7",
 	cursor_border = "#7aa2f7",
 }
+config.line_height = 1.15
 
 config.keys = {
 	{
