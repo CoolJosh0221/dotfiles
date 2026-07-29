@@ -194,6 +194,18 @@
   typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=7
   # Custom icon.
   # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
+  #
+  # Powerlevel10k 1.19.0 keeps the quotes from ID="endeavouros" but matches
+  # EndeavourOS only as an unquoted value, causing it to use the generic Linux
+  # icon. Override it here without modifying the vendored theme.
+  if [[ "$OSTYPE" == linux* && -r /etc/os-release ]]; then
+    local os_release_line os_release_id
+    os_release_line=${${(M)${(f)"$(</etc/os-release)"}:#ID=*}[1]}
+    os_release_id=${(Q)${os_release_line#ID=}}
+    if [[ "$os_release_id" == endeavouros ]]; then
+      typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uF322'
+    fi
+  fi
 
   ################################[ prompt_char: prompt symbol ]################################
   # Transparent background.

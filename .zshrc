@@ -41,9 +41,12 @@ setopt HIST_VERIFY
 # second, so 10 means 100 ms.
 KEYTIMEOUT=10
 
-# macOS toolchain and PATH definitions.
+# OS-specific toolchain and PATH definitions. Linux is sourced directly from
+# this repository because it does not need a separate link in $HOME.
 if [[ "$OSTYPE" == darwin* && -r "$HOME/environment-macos-arm64.zsh" ]]; then
   source "$HOME/environment-macos-arm64.zsh"
+elif [[ "$OSTYPE" == linux* && -r "$HOME/dotfiles/environment-linux.zsh" ]]; then
+  source "$HOME/dotfiles/environment-linux.zsh"
 fi
 
 # -----------------------------------------------------------------------------
@@ -75,7 +78,6 @@ plugins=(
   git
   dirhistory
   sudo
-  shellfirm
   zsh-autosuggestions
   zsh-vi-mode
 )
@@ -314,9 +316,14 @@ gclone() {
   command git clone --depth=1 --single-branch "$@"
 }
 
+# shellfirm 0.3+ wraps accept-line so a rejected command never reaches
+# preexec. Initialize it after the other widget providers and only when the
+# binary is installed.
+if (( $+commands[shellfirm] )); then
+  eval "$(shellfirm init zsh)"
+fi
+
 # zsh-syntax-highlighting must be sourced after every custom ZLE widget.
 _zsh_highlighting="$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 [[ -r "$_zsh_highlighting" ]] && source "$_zsh_highlighting"
 unset _zsh_highlighting
-
-
