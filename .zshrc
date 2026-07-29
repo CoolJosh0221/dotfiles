@@ -319,3 +319,4 @@ _zsh_highlighting="$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highli
 [[ -r "$_zsh_highlighting" ]] && source "$_zsh_highlighting"
 unset _zsh_highlighting
 
+
