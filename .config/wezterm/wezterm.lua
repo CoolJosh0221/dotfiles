@@ -1,3 +1,4 @@
+-- Josh WezTerm config: local no-restore + remote SSHMUX layouts (2026-07-29)
 local wezterm = require("wezterm")
 local act = wezterm.action
 local mux = wezterm.mux
@@ -30,20 +31,24 @@ config.initial_rows = 28
 
 config.font = wezterm.font_with_fallback({
 	{
+		family = "IosevkaKanade Nerd Font SemiCondensed",
+		weight = 500,
+	},
+	{
 		family = "IosevkaKanade Nerd Font",
 		weight = 500,
 	},
 	"Noto Color Emoji",
 	"Noto Sans TC",
 })
-config.font_size = 15
-config.line_height = 1.15
+config.font_size = 15.5
+config.line_height = 1.1
 config.color_scheme = "tokyonight_moon"
 
 -- Borderless Linux-like window, but retain resize handles and the macOS shadow.
 config.window_decorations = "RESIZE|MACOS_FORCE_ENABLE_SHADOW"
-config.window_background_opacity = 0.8
-config.macos_window_background_blur = 35
+config.window_background_opacity = 0.78
+config.macos_window_background_blur = 0
 config.window_padding = {
 	left = 12,
 	right = 14,
@@ -54,8 +59,8 @@ config.window_padding = {
 config.default_cursor_style = "SteadyBar"
 config.hide_mouse_cursor_when_typing = true
 config.inactive_pane_hsb = {
-	saturation = 0.90,
-	brightness = 0.82,
+	saturation = 0.9,
+	brightness = 0.45,
 }
 
 config.enable_scroll_bar = true
@@ -170,9 +175,20 @@ local function clean_domain_name(domain)
 	return domain
 end
 
+local explicit_tab_title_cache = {}
+
 local function tab_title(tab)
+	local tab_id = tostring(tab.tab_id)
+
 	if tab.tab_title and #tab.tab_title > 0 then
+		explicit_tab_title_cache[tab_id] = tab.tab_title
 		return tab.tab_title
+	end
+
+	-- format-tab-title is evaluated twice, including a hover pass. Preserve an
+	-- explicit title if WezTerm briefly reports an empty title during recompute.
+	if explicit_tab_title_cache[tab_id] then
+		return explicit_tab_title_cache[tab_id]
 	end
 
 	local pane = tab.active_pane
@@ -286,53 +302,33 @@ config.quick_select_patterns = {
 config.quick_select_alphabet = "arstneioqwfpbjluyzxcdvkmgh"
 
 -- ---------------------------------------------------------------------------
--- Persistent local mux and SSH domains
+-- Local GUI sessions and SSH domains
 -- ---------------------------------------------------------------------------
-config.unix_domains = {
-	{
-		name = "local-mux",
-	},
-}
-config.default_workspace = "scratch"
-config.default_gui_startup_args = { "connect", "local-mux" }
+-- Start a fresh local GUI session instead of reconnecting to a persistent
+-- wezterm-mux-server. Tabs, panes, windows, and workspaces will end when the
+-- WezTerm GUI is fully quit.
+config.default_domain = "local"
+config.default_gui_startup_args = { "start" }
 
 -- Do not set config.ssh_domains here. WezTerm will read ~/.ssh/config and
 -- expose both SSH:<host> and SSHMUX:<host> domains automatically.
 
 -- ---------------------------------------------------------------------------
--- Workspaces and project layouts
--- Layouts use the active pane's current directory, so they are project-agnostic.
+-- Project layouts
+-- Shift+C and Shift+R append layouts to the currently focused window. They
+-- inherit the active pane's domain, so the same shortcuts work locally and in
+-- an SSHMUX:eos4090 window. Shift+E opens eos4090 in a separate SSHMUX window.
 -- ---------------------------------------------------------------------------
 local function current_cwd(pane)
 	return uri_file_path(pane:get_current_working_dir()) or wezterm.home_dir
 end
 
-local function workspace_exists(name)
-	for _, existing in ipairs(mux.get_workspace_names()) do
-		if existing == name then
-			return true
-		end
-	end
-	return false
-end
+local create_cp_layout = wezterm.action_callback(function(window, pane)
+	local cwd = current_cwd(pane)
+	local domain = { DomainName = pane:get_domain_name() }
+	local mux_window = window:mux_window()
 
-local function switch_or_create_workspace(name, create)
-	return wezterm.action_callback(function(window, pane)
-		if workspace_exists(name) then
-			window:perform_action(act.SwitchToWorkspace({ name = name }), pane)
-			return
-		end
-
-		create(pane)
-		mux.set_active_workspace(name)
-	end)
-end
-
-local create_cp_workspace = switch_or_create_workspace("cp", function(source_pane)
-	local cwd = current_cwd(source_pane)
-	local domain = { DomainName = source_pane:get_domain_name() }
-	local tab, editor, mux_window = mux.spawn_window({
-		workspace = "cp",
+	local tab, editor = mux_window:spawn_tab({
 		cwd = cwd,
 		domain = domain,
 	})
@@ -348,14 +344,16 @@ local create_cp_workspace = switch_or_create_workspace("cp", function(source_pan
 		size = 0.50,
 		cwd = cwd,
 	})
+
 	editor:activate()
 end)
 
-local create_research_workspace = switch_or_create_workspace("research", function(source_pane)
-	local cwd = current_cwd(source_pane)
-	local domain = { DomainName = source_pane:get_domain_name() }
-	local code_tab, code_pane, mux_window = mux.spawn_window({
-		workspace = "research",
+local create_research_layout = wezterm.action_callback(function(window, pane)
+	local cwd = current_cwd(pane)
+	local domain = { DomainName = pane:get_domain_name() }
+	local mux_window = window:mux_window()
+
+	local code_tab, code_pane = mux_window:spawn_tab({
 		cwd = cwd,
 		domain = domain,
 	})
@@ -377,26 +375,16 @@ local create_research_workspace = switch_or_create_workspace("research", functio
 		domain = domain,
 	})
 	notes_tab:set_title("notes")
+
 	code_pane:activate()
 end)
 
-local create_remote_workspace = switch_or_create_workspace("remote", function()
-	local local_domain = { DomainName = "local-mux" }
-	local shell_tab, shell_pane, mux_window = mux.spawn_window({
-		workspace = "remote",
-		domain = local_domain,
-		cwd = wezterm.home_dir,
-		args = { "ssh", "eos4090" },
+local open_eos4090_window = wezterm.action_callback(function()
+	wezterm.background_child_process({
+		wezterm.executable_dir .. "/wezterm",
+		"connect",
+		"SSHMUX:eos4090",
 	})
-	shell_tab:set_title("eos4090")
-
-	local monitor_tab = mux_window:spawn_tab({
-		domain = local_domain,
-		cwd = wezterm.home_dir,
-		args = { "ssh", "eos4090" },
-	})
-	monitor_tab:set_title("monitor")
-	shell_pane:activate()
 end)
 
 local rename_tab = act.PromptInputLine({
@@ -421,94 +409,295 @@ local create_named_workspace = act.PromptInputLine({
 -- Vim-oriented leader and modal controls
 -- ---------------------------------------------------------------------------
 config.leader = {
-	key = "Space",
-	mods = "CTRL|SHIFT",
-	timeout_milliseconds = 1200,
+	key = ";",
+	mods = "CTRL",
+	timeout_milliseconds = 15000,
 }
 
-config.keys = {
-	-- Send the literal leader chord by pressing Leader then Space.
-	{
-		key = "Space",
-		mods = "LEADER",
-		action = act.SendKey({ key = "Space", mods = "CTRL|SHIFT" }),
-	},
+config.keys = {}
 
-	-- Panes: Vim directions and Vim split vocabulary.
-	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
-	{ key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
-	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
-	{ key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
-	{
-		key = "s",
-		mods = "LEADER",
-		action = act.SplitPane({ direction = "Down", size = { Percent = 50 } }),
-	},
-	{
-		key = "v",
-		mods = "LEADER",
-		action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }),
-	},
-	{
-		key = "r",
-		mods = "LEADER",
-		action = act.ActivateKeyTable({
-			name = "resize_pane",
-			one_shot = false,
-			timeout_milliseconds = 3000,
+-- Define leader bindings once. The same metadata generates both the real
+-- keybindings and the searchable Leader + ? menu.
+local shortcut_choices = {}
+local shortcut_actions = {}
+
+local function add_key(binding)
+	table.insert(config.keys, {
+		key = binding.key,
+		mods = binding.mods,
+		action = binding.action,
+	})
+
+	if binding.show_in_menu ~= false and binding.mods:find("LEADER", 1, true) then
+		local id = tostring(#shortcut_choices + 1)
+		shortcut_actions[id] = binding.action
+
+		table.insert(shortcut_choices, {
+			id = id,
+			label = string.format(
+				"%-13s  %-13s  %s",
+				binding.display_key or binding.key,
+				"[" .. (binding.group or "Other") .. "]",
+				binding.description or ""
+			),
+		})
+	end
+end
+
+local open_shortcut_menu = wezterm.action_callback(function(window, pane)
+	window:perform_action(
+		act.InputSelector({
+			title = "WezTerm leader shortcuts",
+			description = "j/k or arrows: move   /: search   Enter: run   Esc: close",
+			fuzzy = false,
+			choices = shortcut_choices,
+			action = wezterm.action_callback(function(inner_window, inner_pane, id)
+				local selected_action = id and shortcut_actions[id]
+				if selected_action then
+					inner_window:perform_action(selected_action, inner_pane)
+				end
+			end),
 		}),
-	},
-	{ key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
-	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
-	{ key = "X", mods = "LEADER", action = act.CloseCurrentTab({ confirm = true }) },
-	{ key = "p", mods = "LEADER", action = act.PaneSelect({ mode = "Activate" }) },
-	{ key = "o", mods = "LEADER", action = act.RotatePanes("Clockwise") },
+		pane
+	)
+end)
 
-	-- Tabs.
-	{ key = "c", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
-	{ key = "[", mods = "LEADER", action = act.ActivateTabRelative(-1) },
-	{ key = "]", mods = "LEADER", action = act.ActivateTabRelative(1) },
-	{ key = "e", mods = "LEADER", action = rename_tab },
+-- Send the literal leader chord by pressing Leader then ;.
+add_key({
+	key = ";",
+	mods = "LEADER",
+	group = "General",
+	description = "Send literal Ctrl+;",
+	action = act.SendKey({ key = ";", mods = "CTRL" }),
+})
 
-	-- Search, copy mode, Quick Select, and the central fuzzy launcher.
-	{ key = "/", mods = "LEADER", action = act.Search("CurrentSelectionOrEmptyString") },
-	{ key = "y", mods = "LEADER", action = act.ActivateCopyMode },
-	{ key = "f", mods = "LEADER", action = act.QuickSelect },
-	{
-		key = "Space",
-		mods = "LEADER|SHIFT",
-		action = act.ShowLauncherArgs({
-			flags = "FUZZY|TABS|WORKSPACES|DOMAINS|LAUNCH_MENU_ITEMS|COMMANDS|KEY_ASSIGNMENTS",
-		}),
-	},
-	{
-		key = "d",
-		mods = "LEADER",
-		action = act.ShowLauncherArgs({ flags = "FUZZY|DOMAINS" }),
-	},
+-- Panes: Vim directions and Vim split vocabulary.
+add_key({
+	key = "h",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Focus pane left",
+	action = act.ActivatePaneDirection("Left"),
+})
+add_key({
+	key = "j",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Focus pane down",
+	action = act.ActivatePaneDirection("Down"),
+})
+add_key({
+	key = "k",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Focus pane up",
+	action = act.ActivatePaneDirection("Up"),
+})
+add_key({
+	key = "l",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Focus pane right",
+	action = act.ActivatePaneDirection("Right"),
+})
+add_key({
+	key = "s",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Split top/bottom",
+	action = act.SplitPane({ direction = "Down", size = { Percent = 50 } }),
+})
+add_key({
+	key = "v",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Split left/right",
+	action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }),
+})
+add_key({
+	key = "r",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Enter resize mode",
+	action = act.ActivateKeyTable({
+		name = "resize_pane",
+		one_shot = false,
+		timeout_milliseconds = 3000,
+	}),
+})
+add_key({
+	key = "z",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Toggle pane zoom",
+	action = act.TogglePaneZoomState,
+})
+add_key({
+	key = "x",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Close current pane",
+	action = act.CloseCurrentPane({ confirm = true }),
+})
+add_key({
+	key = "X",
+	mods = "LEADER",
+	group = "Tab",
+	description = "Close current tab",
+	action = act.CloseCurrentTab({ confirm = true }),
+})
+add_key({
+	key = "p",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Select a pane",
+	action = act.PaneSelect({ mode = "Activate" }),
+})
+add_key({
+	key = "o",
+	mods = "LEADER",
+	group = "Pane",
+	description = "Rotate panes clockwise",
+	action = act.RotatePanes("Clockwise"),
+})
 
-	-- Workspaces.
-	{
-		key = "w",
-		mods = "LEADER",
-		action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }),
-	},
-	{ key = "W", mods = "LEADER", action = create_named_workspace },
-	{ key = "C", mods = "LEADER", action = create_cp_workspace },
-	{ key = "R", mods = "LEADER", action = create_research_workspace },
-	{ key = "M", mods = "LEADER", action = create_remote_workspace },
-
-	-- Explicitly safe close behavior for familiar macOS shortcuts.
-	{ key = "w", mods = "CMD", action = act.CloseCurrentTab({ confirm = true }) },
-}
+-- Tabs.
+add_key({
+	key = "c",
+	mods = "LEADER",
+	group = "Tab",
+	description = "Create a new tab",
+	action = act.SpawnTab("CurrentPaneDomain"),
+})
+add_key({
+	key = "[",
+	mods = "LEADER",
+	group = "Tab",
+	description = "Activate previous tab",
+	action = act.ActivateTabRelative(-1),
+})
+add_key({
+	key = "]",
+	mods = "LEADER",
+	group = "Tab",
+	description = "Activate next tab",
+	action = act.ActivateTabRelative(1),
+})
+add_key({
+	key = "e",
+	mods = "LEADER",
+	group = "Tab",
+	description = "Rename current tab",
+	action = rename_tab,
+})
 
 for i = 1, 9 do
-	table.insert(config.keys, {
+	add_key({
 		key = tostring(i),
 		mods = "LEADER",
+		group = "Tab",
+		description = "Activate tab " .. tostring(i),
 		action = act.ActivateTab(i - 1),
 	})
 end
+
+-- Search, copy mode, Quick Select, and launchers.
+add_key({
+	key = "/",
+	mods = "LEADER",
+	group = "Search",
+	description = "Search terminal scrollback",
+	action = act.Search("CurrentSelectionOrEmptyString"),
+})
+add_key({
+	key = "y",
+	mods = "LEADER",
+	group = "Search",
+	description = "Enter keyboard copy mode",
+	action = act.ActivateCopyMode,
+})
+add_key({
+	key = "f",
+	mods = "LEADER",
+	group = "Search",
+	description = "Open Quick Select",
+	action = act.QuickSelect,
+})
+add_key({
+	key = "Space",
+	mods = "LEADER|SHIFT",
+	display_key = "Shift+Space",
+	group = "Launcher",
+	description = "Open full fuzzy launcher",
+	action = act.ShowLauncherArgs({
+		flags = "FUZZY|TABS|WORKSPACES|DOMAINS|LAUNCH_MENU_ITEMS|COMMANDS|KEY_ASSIGNMENTS",
+	}),
+})
+add_key({
+	key = "d",
+	mods = "LEADER",
+	group = "Launcher",
+	description = "Open SSH/domain launcher",
+	action = act.ShowLauncherArgs({ flags = "FUZZY|DOMAINS" }),
+})
+
+-- Workspaces, layouts, and remote access.
+add_key({
+	key = "w",
+	mods = "LEADER",
+	group = "Workspace",
+	description = "Select workspace",
+	action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }),
+})
+add_key({
+	key = "W",
+	mods = "LEADER",
+	group = "Workspace",
+	description = "Create or switch named workspace",
+	action = create_named_workspace,
+})
+add_key({
+	key = "C",
+	mods = "LEADER",
+	display_key = "Shift+C",
+	group = "Layout",
+	description = "Append competitive-programming tab layout",
+	action = create_cp_layout,
+})
+add_key({
+	key = "R",
+	mods = "LEADER",
+	display_key = "Shift+R",
+	group = "Layout",
+	description = "Append code, experiments, and notes tabs",
+	action = create_research_layout,
+})
+add_key({
+	key = "E",
+	mods = "LEADER",
+	display_key = "Shift+E",
+	group = "Remote",
+	description = "Open eos4090 SSHMUX in a new window",
+	action = open_eos4090_window,
+})
+
+-- Searchable shortcut reference. Use ? directly; phys:/ is intentionally not used.
+add_key({
+	key = "?",
+	mods = "LEADER|SHIFT",
+	display_key = "?",
+	group = "Help",
+	description = "Show leader shortcut menu",
+	action = open_shortcut_menu,
+})
+
+-- Explicitly safe close behavior for the familiar macOS shortcut.
+add_key({
+	key = "w",
+	mods = "CMD",
+	action = act.CloseCurrentTab({ confirm = true }),
+	show_in_menu = false,
+})
 
 config.key_tables = {
 	resize_pane = {

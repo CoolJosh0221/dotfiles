@@ -127,8 +127,8 @@ zstyle ':completion:*:*:docker-*:*' option-stacking yes
 
 # zoxide provides the normal `z` command. Do not alias `cd=z`; that obscures
 # standard cd semantics and can create recursion with alternative init modes.
-if (( $+commands[zoxide] )); then
-  eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh --cmd cd)"
 fi
 
 if (( $+commands[direnv] )); then

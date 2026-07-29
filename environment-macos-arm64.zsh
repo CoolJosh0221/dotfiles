@@ -74,3 +74,6 @@ fi
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export CARGO_HTTP_MULTIPLEXING=false
 export OLLAMA_ORIGINS='*'
+
+# Named directories
+[[ -d "$HOME/Desktop/C++" ]] && hash -d cp="$HOME/Desktop/C++"
