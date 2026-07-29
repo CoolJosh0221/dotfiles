@@ -1,87 +1,76 @@
-# environment-macos-arm64.zsh
+# macOS Apple Silicon environment
+[[ "$OSTYPE" == darwin* ]] || return 0
 
-# Path configurations
-export PATH=$PATH:/Applications/MacVim.app/Contents/bin
-export PATH="/Users/josh/.local/bin:$PATH"
-export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
-export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
-export CPPFLAGS="-I/opt/homebrew/opt/openjdk@17/include"
-export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
-export PATH=~/apache-maven-3.8.7/bin:$PATH
-export PATH=$PATH:/Users/josh/.spicetify
-export PATH=$PATH:/usr/local/share/dotnet/dotnet
-export PATH=$PATH:/Applications/kitty.app/Contents/MacOS
-export PATH="/Users/josh/mambaforge/bin:$PATH"
+# Keep PATH unique while preserving the order declared below.
+typeset -U path PATH
+typeset -a _preferred_paths
 
-# Conda initialization
-__conda_setup="$('/Users/josh/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/josh/mambaforge/etc/profile.d/conda.sh" ]; then
-        . "/Users/josh/mambaforge/etc/profile.d/conda.sh"
-    fi
-fi
-unset __conda_setup
-
-if [ -f "/Users/josh/mambaforge/etc/profile.d/mamba.sh" ]; then
-    . "/Users/josh/mambaforge/etc/profile.d/mamba.sh"
+# Resolve Java 17 through macOS instead of hardcoding a Cellar path.
+if [[ -x /usr/libexec/java_home ]]; then
+  _java_home="$(/usr/libexec/java_home -v 17 2>/dev/null)"
+  if [[ -n "$_java_home" ]]; then
+    export JAVA_HOME="$_java_home"
+  fi
+  unset _java_home
 fi
 
-# CXX compiler
-export CXX=/usr/bin/g++
-
-# SDKMAN initialization
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
-
-# Bun configurations
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-export PATH="/opt/homebrew/opt/libxslt/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/libxslt/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/libxslt/include"
-
-# Pixi configurations
-export PATH=$PATH:/Users/josh/.pixi/bin
-eval "$(pixi completion --shell zsh)"
+export PNPM_HOME="$HOME/Library/pnpm"
 export MODULAR_HOME="$HOME/.modular"
-export PATH="$MODULAR_HOME/pkg/packages.modular.com_mojo/bin:$PATH"
+export SDKMAN_DIR="$HOME/.sdkman"
 
-# Direnv hook
-eval "$(direnv hook zsh)"
+_preferred_paths=(
+  "$HOME/.local/bin"
+  "/opt/homebrew/bin"
+  "/opt/homebrew/sbin"
+  "/opt/homebrew/opt/llvm/bin"
+  "${JAVA_HOME:+$JAVA_HOME/bin}"
+  "/opt/homebrew/opt/openjdk@17/bin"
+  "/opt/homebrew/opt/node@18/bin"
+  "$HOME/apache-maven-3.8.7/bin"
+  "$BUN_INSTALL/bin"
+  "/opt/homebrew/opt/libxslt/bin"
+  "$HOME/.pixi/bin"
+  "$MODULAR_HOME/pkg/packages.modular.com_mojo/bin"
+  "$PNPM_HOME"
+  "$HOME/mambaforge/bin"
+  "/Applications/MacVim.app/Contents/bin"
+  "$HOME/.spicetify"
+  "/usr/local/share/dotnet"
+  "/opt/homebrew/share/dotnet"
+  "/Applications/kitty.app/Contents/MacOS"
+)
 
-# PNPM configurations
-export PNPM_HOME="/Users/josh/Library/pnpm"
-case ":$PATH:" in
-*":$PNPM_HOME:"*) ;;
-*) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+# Add only directories that exist; do not leave dead PATH entries.
+typeset -a _existing_paths
+for _dir in "${_preferred_paths[@]}"; do
+  [[ -n "$_dir" && -d "$_dir" ]] && _existing_paths+=("$_dir")
+done
+path=("${_existing_paths[@]}" "${path[@]}")
+unset _preferred_paths _existing_paths _dir
 
-# Additional source commands
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-source /opt/homebrew/opt/modules/init/zsh
-[ -f "/Users/josh/.ghcup/env" ] && . "/Users/josh/.ghcup/env"
+# Keep interactive compiler aliases and build-system compiler variables aligned.
+_gxx="$(command -v g++-16 2>/dev/null)"
+_gcc="$(command -v gcc-16 2>/dev/null)"
+[[ -n "$_gxx" ]] && export CXX="$_gxx"
+[[ -n "$_gcc" ]] && export CC="$_gcc"
+unset _gxx _gcc
 
-# GCC colors
+# Consolidate build flags instead of overwriting earlier values repeatedly.
+# The membership checks also prevent duplicates when ~/.zshrc is re-sourced.
+if [[ -d /opt/homebrew/opt/llvm/lib && " ${LDFLAGS:-} " != *" -L/opt/homebrew/opt/llvm/lib "* ]]; then
+  export LDFLAGS="-L/opt/homebrew/opt/llvm/lib${LDFLAGS:+ $LDFLAGS}"
+fi
+if [[ -d /opt/homebrew/opt/libxslt/lib && " ${LDFLAGS:-} " != *" -L/opt/homebrew/opt/libxslt/lib "* ]]; then
+  export LDFLAGS="-L/opt/homebrew/opt/libxslt/lib${LDFLAGS:+ $LDFLAGS}"
+fi
+if [[ -d /opt/homebrew/opt/llvm/include && " ${CPPFLAGS:-} " != *" -I/opt/homebrew/opt/llvm/include "* ]]; then
+  export CPPFLAGS="-I/opt/homebrew/opt/llvm/include${CPPFLAGS:+ $CPPFLAGS}"
+fi
+if [[ -d /opt/homebrew/opt/libxslt/include && " ${CPPFLAGS:-} " != *" -I/opt/homebrew/opt/libxslt/include "* ]]; then
+  export CPPFLAGS="-I/opt/homebrew/opt/libxslt/include${CPPFLAGS:+ $CPPFLAGS}"
+fi
+
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# Aliases
-alias vim=nvim
-alias ls='eza --git --color=always --group-directories-first'
-alias cd=z
-
-# Cargo configurations
 export CARGO_HTTP_MULTIPLEXING=false
-eval "$(navi widget zsh)"
-eval "$(zoxide init zsh)"
-alias icat="kitty +kitten icat"
-source $HOME/.cargo/env
-
-# Powerlevel9K terminal integration
-export POWERLEVEL9K_TERM_SHELL_INTEGRATION=true
-
-alias g++='g++-15'
-alias gcc='gcc-15'
+export OLLAMA_ORIGINS='*'

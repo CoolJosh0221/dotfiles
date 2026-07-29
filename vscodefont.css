@@ -1,3 +1,9 @@
+:root {
+	--ui-font:   'Hanken Grotesk', 'FigTree', 'SUSE', 'Sofia Pro', 'DM Sans', 'Ubuntu', sans-serif;
+	--code-font: 'Iosevka Kanade Semi-Condensed', 'Iosevka Kanade', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Menlo, Consolas, monospace;
+}
+
+/* 1 — UI font for workbench chrome */
 .label-name,
 .pane-header,
 .search-label,
@@ -8,12 +14,21 @@
 .statusbar-item-label,
 .monaco-highlighted-label,
 .scm-input *:not(.codicon),
-.monaco-scrollable-element,
 .shadow-root-host, .shadow-root-host *,
 .suggest-input-container *:not(.codicon),
 .menubar-menu-title:not(.toolbar-toggle-more),
+.part.sidebar .monaco-scrollable-element,
+.part.auxiliarybar .monaco-scrollable-element,
 .monaco-dialog-box *:not(.codicon):not(.codicon *),
 .chat-input-container *:not(.chat-attachments-container):not(.chat-attachments-container *):not(.codicon):not(.codicon *) {
-	/* font-family: "Iosevka Kanade", "Jetbrains Mono", "Fira Code", "Menlo", "Consolas", monospace; */
-	font-family: 'SUSE', 'Sofia Pro', 'Figtree', 'DM Sans', 'Ubuntu', sans-serif;
+	font-family: var(--ui-font);
+}
+
+/* 2 — hand the editor's own widgets back to the editor font */
+.suggest-widget,
+.suggest-widget *:not(.codicon):not(.codicon *),
+.suggest-details,
+.suggest-details *:not(.codicon):not(.codicon *),
+.parameter-hints-widget *:not(.codicon):not(.codicon *) {
+	font-family: var(--vscode-editor-font-family, var(--code-font));
 }
