@@ -47,7 +47,7 @@ config.color_scheme = "tokyonight_moon"
 
 -- Borderless Linux-like window, but retain resize handles and the macOS shadow.
 config.window_decorations = "RESIZE|MACOS_FORCE_ENABLE_SHADOW"
-config.window_background_opacity = 0.78
+config.window_background_opacity = 0.8
 config.macos_window_background_blur = 0
 config.window_padding = {
 	left = 12,
