@@ -1,0 +1,8 @@
+time=2026-07-28T22:03:33.930+08:00 level=INFO msg="Successfully detected terminal cell size via ioctl" pixels_per_column=17 pixels_per_row=42
+time=2026-07-28T22:03:33.930+08:00 level=INFO msg="Terminal cell size detection" pixels_per_column=17 pixels_per_row=42
+time=2026-07-28T22:03:33.955+08:00 level=ERROR msg="Rendered output data inconsistency" name=R-413-preview lineCnt=1 totalHeight=0 totalWidth=0 maxW=0
+time=2026-07-28T22:03:39.421+08:00 level=ERROR msg="exif error" error=EOF
+time=2026-07-28T22:03:49.620+08:00 level=ERROR msg="cannot get stats" path=/Users/josh/Downloads/config error="stat /Users/josh/Downloads/config: no such file or directory"
+time=2026-07-28T22:03:49.621+08:00 level=INFO msg="Successfully detected terminal cell size via ioctl" pixels_per_column=17 pixels_per_row=42
+time=2026-07-28T22:03:49.621+08:00 level=INFO msg="Terminal cell size detection" pixels_per_column=17 pixels_per_row=42
+time=2026-07-28T22:03:49.684+08:00 level=ERROR msg="Rendered output data inconsistency" name=R-513-preview lineCnt=1 totalHeight=0 totalWidth=0 maxW=0
