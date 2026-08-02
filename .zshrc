@@ -259,7 +259,7 @@ if (( $+commands[brew] )); then
 fi
 
 spf() {
-  command spf -c "$HOME/.config/superfile/config.toml" "$@"
+  command spf -c "$HOME/.config/superfile/config.toml" --hf "$HOME/.config/superfile/hotkeys.toml" "$@"
 }
 
 icat() {

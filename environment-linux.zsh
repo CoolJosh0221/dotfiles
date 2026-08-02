@@ -10,6 +10,8 @@ export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"
 export MODULAR_HOME="$HOME/.modular"
 export SDKMAN_DIR="$HOME/.sdkman"
 export NVM_DIR="$HOME/.nvm"
+export MAMBA_ROOT_PREFIX="$HOME/mambaforge"
+export MAMBA_EXE="$MAMBA_ROOT_PREFIX/bin/mamba"
 
 _preferred_paths=(
   "$HOME/.local/bin"
@@ -23,7 +25,7 @@ _preferred_paths=(
   "$HOME/.pixi/bin"
   "$MODULAR_HOME/pkg/packages.modular.com_mojo/bin"
   "$PNPM_HOME"
-  "$HOME/mambaforge/bin"
+  "$MAMBA_ROOT_PREFIX/bin"
   "$HOME/.spicetify"
 )
 
