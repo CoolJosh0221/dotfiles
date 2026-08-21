@@ -1,34 +1,291 @@
 :root {
-	--ui-font:   'Hanken Grotesk', 'FigTree', 'SUSE', 'Sofia Pro', 'DM Sans', 'Ubuntu', sans-serif;
-	--code-font: 'Iosevka Kanade Semi-Condensed', 'Iosevka Kanade', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Menlo, Consolas, monospace;
+	--ui-font:
+		'Hanken Grotesk',
+		'Figtree',
+		'SUSE',
+		'Sofia Pro',
+		'DM Sans',
+		'Ubuntu',
+		sans-serif;
+
+	--code-font:
+		'Iosevka Kanade Semi-Condensed',
+		'Iosevka Kanade',
+		'JetBrains Mono',
+		'Cascadia Code',
+		'Fira Code',
+		Menlo,
+		Consolas,
+		monospace;
 }
 
-/* 1 — UI font for workbench chrome */
-.label-name,
-.pane-header,
-.search-label,
-.monaco-dropdown,
-.composite.title,
-.notification-toast,
-.quick-input-header,
-.statusbar-item-label,
-.monaco-highlighted-label,
-.scm-input *:not(.codicon),
-.shadow-root-host, .shadow-root-host *,
-.suggest-input-container *:not(.codicon),
-.menubar-menu-title:not(.toolbar-toggle-more),
-.part.sidebar .monaco-scrollable-element,
-.part.auxiliarybar .monaco-scrollable-element,
-.monaco-dialog-box *:not(.codicon):not(.codicon *),
-.chat-input-container *:not(.chat-attachments-container):not(.chat-attachments-container *):not(.codicon):not(.codicon *) {
-	font-family: var(--ui-font);
+/*
+ * ===========================================================================
+ * 1. Workbench-wide UI typography
+ * ===========================================================================
+ *
+ * Apply the UI font at high-level workbench roots and let normal inheritance
+ * cover native VS Code UI:
+ *
+ * - title bar and command center
+ * - activity bar
+ * - primary and secondary sidebars
+ * - Explorer, Search, SCM, Run/Debug, Testing and Extensions
+ * - tabs and breadcrumbs
+ * - Settings and Keyboard Shortcuts
+ * - panels and status bar
+ * - menus, dialogs, notifications and quick pick
+ * - native extension TreeViews
+ *
+ * Do not use `.monaco-workbench *` here. That would also override icon fonts.
+ */
+
+html,
+body,
+.monaco-workbench,
+:is(
+	.mac,
+	.windows,
+	.linux,
+	:host-context(.OS)
+):not(.monaco-mouse-cursor-text) {
+	font-family: var(--ui-font) !important;
 }
 
-/* 2 — hand the editor's own widgets back to the editor font */
-.suggest-widget,
-.suggest-widget *:not(.codicon):not(.codicon *),
-.suggest-details,
-.suggest-details *:not(.codicon):not(.codicon *),
-.parameter-hints-widget *:not(.codicon):not(.codicon *) {
-	font-family: var(--vscode-editor-font-family, var(--code-font));
+/*
+ * Expose the selected code font through the variables used by Monaco.
+ *
+ * Do not override --vscode-font-family: it is used broadly by internal
+ * workbench components and is unnecessary when root inheritance is applied.
+ */
+.monaco-workbench {
+	--vscode-editor-font-family: var(--code-font);
+	--monaco-monospace-font: var(--code-font);
 }
+
+/*
+ * ===========================================================================
+ * 2. Native workbench containers
+ * ===========================================================================
+ *
+ * These declarations reinforce the inherited UI font where VS Code or an
+ * extension places an explicit font-family on a major native container.
+ *
+ * Descendants are intentionally not selected with `*`.
+ */
+
+.monaco-workbench :where(
+	.part.titlebar,
+	.part.activitybar,
+	.part.sidebar,
+	.part.auxiliarybar,
+	.part.panel,
+	.part.statusbar,
+
+	.editor-group-container > .title,
+	.tabs-container,
+	.breadcrumbs-control,
+
+	.monaco-pane-view,
+	.monaco-list,
+	.monaco-tree,
+	.monaco-action-bar,
+	.monaco-toolbar,
+
+	.quick-input-widget,
+	.context-view,
+	.context-menu,
+	.monaco-hover,
+	.monaco-dialog-box,
+
+	.notifications-center,
+	.notifications-toasts,
+	.notification-toast,
+
+	.preferences-editor,
+	.settings-editor,
+	.keybindings-editor,
+
+	.extensions-viewlet,
+	.extensions-editor,
+
+	.gettingStartedContainer,
+	.welcomePage,
+	.welcomePageContainer,
+
+	.search-view,
+	.scm-view,
+	.testing-view,
+
+	.chat-view,
+	.chat-widget,
+	.chat-input-container,
+	.interactive-session,
+
+	.notebook-editor
+) {
+	font-family: var(--ui-font) !important;
+}
+
+/*
+ * ===========================================================================
+ * 3. UI controls and labels
+ * ===========================================================================
+ *
+ * Form controls may not reliably inherit their surrounding font.
+ *
+ * Monaco editor input areas are excluded because they require the code font.
+ * Codicon elements are excluded so the active Product Icon Theme remains in
+ * control of its own icon font.
+ */
+
+.monaco-workbench :where(
+	input:not(.monaco-mouse-cursor-text),
+	textarea:not(.monaco-mouse-cursor-text),
+	select,
+	option,
+	button,
+
+	.monaco-inputbox input:not(.monaco-mouse-cursor-text),
+	.monaco-inputbox textarea:not(.monaco-mouse-cursor-text),
+	.monaco-select-box,
+	.monaco-dropdown,
+	.monaco-button,
+
+	.label-name,
+	.pane-header,
+	.search-label,
+	.statusbar-item-label,
+	.monaco-highlighted-label,
+	.scm-input
+):not(.codicon)
+:not([class^='codicon-'])
+:not([class*=' codicon-']) {
+	font-family: var(--ui-font) !important;
+}
+
+/*
+ * ===========================================================================
+ * 4. Monaco editor text
+ * ===========================================================================
+ *
+ * Target actual Monaco text surfaces rather than `.monaco-editor *`.
+ * This avoids changing icons, action buttons, find widgets and other editor
+ * chrome that happen to live inside the Monaco editor subtree.
+ */
+
+.monaco-workbench :where(
+	.monaco-editor .view-lines,
+	.monaco-editor .margin-view-overlays,
+	.monaco-editor textarea.inputarea,
+	.monaco-editor .monaco-mouse-cursor-text
+) {
+	--monaco-monospace-font: var(--code-font);
+
+	font-family: var(--code-font) !important;
+	font-variant-ligatures: contextual common-ligatures;
+	font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/*
+ * ===========================================================================
+ * 5. Editor-owned code widgets
+ * ===========================================================================
+ *
+ * Suggestions, signatures and parameter hints are code-oriented even though
+ * they are floating workbench widgets.
+ *
+ * Product icons inside them retain their own explicitly assigned icon font
+ * because this rule affects only inheritance and never targets icon
+ * pseudo-elements.
+ */
+
+.monaco-workbench :where(
+	.suggest-widget,
+	.suggest-details,
+	.parameter-hints-widget
+) {
+	--monaco-monospace-font: var(--code-font);
+
+	font-family: var(--code-font) !important;
+	font-variant-ligatures: contextual common-ligatures;
+	font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/*
+ * ===========================================================================
+ * 6. REPL, notebook and chat code
+ * ===========================================================================
+ */
+
+.monaco-workbench :where(
+	.debug-repl,
+	.repl,
+
+	.chat-code-block-part,
+	.interactive-result-code-block,
+
+	.notebook-code-cell-row,
+	.notebook-output pre,
+	.notebook-output code,
+
+	.rendered-markdown pre,
+	.rendered-markdown code
+) {
+	--monaco-monospace-font: var(--code-font);
+
+	font-family: var(--code-font) !important;
+	font-variant-ligatures: contextual common-ligatures;
+	font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/*
+ * Rendered prose in native Chat and Markdown-style workbench components should
+ * use the UI font. The more specific pre/code rules above restore code text.
+ */
+
+.monaco-workbench :where(
+	.chat-view .rendered-markdown,
+	.chat-widget .rendered-markdown,
+	.interactive-session .rendered-markdown
+) {
+	font-family: var(--ui-font) !important;
+}
+
+/*
+ * ===========================================================================
+ * 7. Integrated terminal DOM surfaces
+ * ===========================================================================
+ *
+ * The terminal usually uses its own renderer and should also be configured
+ * through terminal.integrated.fontFamily. These selectors cover DOM-rendered
+ * terminal text and helper input elements without targeting terminal icons.
+ */
+
+.monaco-workbench :where(
+	.xterm .xterm-rows,
+	.xterm .xterm-helper-textarea
+) {
+	font-family: var(--code-font) !important;
+	font-variant-ligatures: contextual common-ligatures;
+	font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/*
+ * ===========================================================================
+ * 8. Product and file icons
+ * ===========================================================================
+ *
+ * Intentionally empty.
+ *
+ * Do not add font-family rules for:
+ *
+ *   .codicon
+ *   .codicon::before
+ *   [class^='codicon-']
+ *   [class*=' codicon-']
+ *   .file-icon
+ *
+ * The active Product Icon Theme and File Icon Theme must remain the sole owners
+ * of icon fonts, glyphs, masks, background images and pseudo-elements.
+ */
