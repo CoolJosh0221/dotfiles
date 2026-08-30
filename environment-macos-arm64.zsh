@@ -5,21 +5,33 @@
 typeset -U path PATH
 typeset -a _preferred_paths
 
-# Resolve Java 17 through macOS instead of hardcoding a Cellar path.
-if [[ -x /usr/libexec/java_home ]]; then
+# Zerobrew paths are declared before PATH construction so PATH is assembled once.
+export ZEROBREW_DIR="$HOME/.zerobrew"
+export ZEROBREW_BIN="$ZEROBREW_DIR/bin"
+export ZEROBREW_ROOT='/opt/zerobrew'
+export ZEROBREW_PREFIX='/opt/zerobrew'
+export PKG_CONFIG_PATH="$ZEROBREW_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+# Prefer Homebrew's stable opt symlink for Java 17. This avoids spawning
+# /usr/libexec/java_home in the common case while still falling back to it.
+_java_home='/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home'
+if [[ -d "$_java_home" ]]; then
+  export JAVA_HOME="$_java_home"
+elif [[ -x /usr/libexec/java_home ]]; then
   _java_home="$(/usr/libexec/java_home -v 17 2>/dev/null)"
-  if [[ -n "$_java_home" ]]; then
-    export JAVA_HOME="$_java_home"
-  fi
-  unset _java_home
+  [[ -n "$_java_home" ]] && export JAVA_HOME="$_java_home"
 fi
+unset _java_home
 
 export BUN_INSTALL="$HOME/.bun"
 export PNPM_HOME="$HOME/Library/pnpm"
 export MODULAR_HOME="$HOME/.modular"
 export SDKMAN_DIR="$HOME/.sdkman"
+export NVM_DIR="$HOME/.nvm"
 
 _preferred_paths=(
+  "$ZEROBREW_PREFIX/bin"
+  "$ZEROBREW_BIN"
   "$HOME/.local/bin"
   "$HOME/go/bin"
   "/opt/homebrew/bin"
@@ -50,12 +62,8 @@ done
 path=("${_existing_paths[@]}" "${path[@]}")
 unset _preferred_paths _existing_paths _dir
 
-# Keep interactive compiler aliases and build-system compiler variables aligned.
-_gxx="$(command -v g++-16 2>/dev/null)"
-_gcc="$(command -v gcc-16 2>/dev/null)"
-[[ -n "$_gxx" ]] && export CXX="$_gxx"
-[[ -n "$_gcc" ]] && export CC="$_gcc"
-unset _gxx _gcc
+# Compiler selection is handled later in ~/.zshrc, where the highest installed
+# Homebrew GCC version is selected without executing `brew --prefix`.
 
 # Consolidate build flags instead of overwriting earlier values repeatedly.
 # The membership checks also prevent duplicates when ~/.zshrc is re-sourced.
@@ -79,56 +87,41 @@ export OLLAMA_ORIGINS='*'
 # Named directories
 [[ -d "$HOME/Desktop/C++" ]] && hash -d cp="$HOME/Desktop/C++"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# NVM is one of the most expensive common Zsh initializers. Since Homebrew's
+# Node 18 is already on PATH above, load NVM only when `nvm` itself is used.
+# After `nvm use ...`, that selected NVM Node takes normal precedence.
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  nvm() {
+    unfunction nvm 2>/dev/null
+    source "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+    nvm "$@"
+  }
+fi
 
-# >>> zerobrew >>>
-# zerobrew
-export ZEROBREW_DIR='/Users/josh/.zerobrew'
-export ZEROBREW_BIN='/Users/josh/.zerobrew/bin'
-export ZEROBREW_ROOT='/opt/zerobrew'
-export ZEROBREW_PREFIX='/opt/zerobrew'
-export PKG_CONFIG_PATH="$ZEROBREW_PREFIX/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
-
-# SSL/TLS certificates (only if ca-certificates is installed)
-if [ -z "${CURL_CA_BUNDLE:-}" ] || [ -z "${SSL_CERT_FILE:-}" ]; then
-  if [ -f "$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem" ]; then
-    [ -z "${CURL_CA_BUNDLE:-}" ] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
-    [ -z "${SSL_CERT_FILE:-}" ] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
-  elif [ -f "$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem" ]; then
-    [ -z "${CURL_CA_BUNDLE:-}" ] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
-    [ -z "${SSL_CERT_FILE:-}" ] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
-  elif [ -f "$ZEROBREW_PREFIX/etc/openssl/cert.pem" ]; then
-    [ -z "${CURL_CA_BUNDLE:-}" ] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
-    [ -z "${SSL_CERT_FILE:-}" ] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
-  elif [ -f "$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem" ]; then
-    [ -z "${CURL_CA_BUNDLE:-}" ] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
-    [ -z "${SSL_CERT_FILE:-}" ] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
+# SSL/TLS certificates (only if ca-certificates is installed).
+if [[ -z "${CURL_CA_BUNDLE:-}" || -z "${SSL_CERT_FILE:-}" ]]; then
+  if [[ -f "$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem" ]]; then
+    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
+    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
+  elif [[ -f "$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem" ]]; then
+    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
+    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
+  elif [[ -f "$ZEROBREW_PREFIX/etc/openssl/cert.pem" ]]; then
+    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
+    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
+  elif [[ -f "$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem" ]]; then
+    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
+    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
   fi
 fi
 
-if [ -z "${SSL_CERT_DIR:-}" ]; then
-  if [ -d "$ZEROBREW_PREFIX/etc/ca-certificates" ]; then
+if [[ -z "${SSL_CERT_DIR:-}" ]]; then
+  if [[ -d "$ZEROBREW_PREFIX/etc/ca-certificates" ]]; then
     export SSL_CERT_DIR="$ZEROBREW_PREFIX/etc/ca-certificates"
-  elif [ -d "$ZEROBREW_PREFIX/etc/openssl/certs" ]; then
+  elif [[ -d "$ZEROBREW_PREFIX/etc/openssl/certs" ]]; then
     export SSL_CERT_DIR="$ZEROBREW_PREFIX/etc/openssl/certs"
-  elif [ -d "$ZEROBREW_PREFIX/share/ca-certificates" ]; then
+  elif [[ -d "$ZEROBREW_PREFIX/share/ca-certificates" ]]; then
     export SSL_CERT_DIR="$ZEROBREW_PREFIX/share/ca-certificates"
   fi
 fi
-
-# Helper function to safely append to PATH
-_zb_path_append() {
-    local argpath="$1"
-    case ":${PATH}:" in
-        *:"$argpath":*) ;;
-        *) export PATH="$argpath:$PATH" ;;
-    esac;
-}
-
-_zb_path_append "$ZEROBREW_BIN"
-_zb_path_append "$ZEROBREW_PREFIX/bin"
-
-# <<< zerobrew <<<
-

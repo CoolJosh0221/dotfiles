@@ -30,7 +30,7 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 HISTFILE="$XDG_STATE_HOME/zsh/history"
 HISTSIZE=100000
 SAVEHIST=100000
-mkdir -p "${HISTFILE:h}"
+[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
@@ -87,11 +87,32 @@ source "$ZSH/oh-my-zsh.sh"
 # Powerlevel10k's generated configuration remains the prompt source of truth.
 [[ -r "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
 
+# Cache generated shell-integration code. Regenerate only when the providing
+# executable changes, rather than forking it in every new shell.
+_zsh_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d "$_zsh_cache_dir" ]] || mkdir -p "$_zsh_cache_dir"
+
+_cache_init() {
+  local name="$1"
+  local binary="$2"
+  shift 2
+  local cache_file="$_zsh_cache_dir/${name}.zsh"
+
+  if [[ ! -s "$cache_file" || "$binary" -nt "$cache_file" ]]; then
+    "$@" >| "$cache_file" 2>/dev/null || {
+      command rm -f "$cache_file"
+      return 1
+    }
+  fi
+
+  [[ -s "$cache_file" ]] && source "$cache_file"
+}
+
 # fzf and navi create ZLE widgets, so load them after synchronous zsh-vi-mode
 # initialization but before zsh-syntax-highlighting.
 [[ -r "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
 if (( $+commands[navi] )); then
-  eval "$(navi widget zsh)"
+  _cache_init navi "${commands[navi]}" "${commands[navi]}" widget zsh
 fi
 bindkey -M viins '^F' autosuggest-accept
 
@@ -127,27 +148,19 @@ zstyle ':completion:*:*:docker-*:*' option-stacking yes
 [[ -r "/opt/homebrew/opt/modules/init/zsh" ]] && source "/opt/homebrew/opt/modules/init/zsh"
 [[ -r "$HOME/.ghcup/env" ]] && source "$HOME/.ghcup/env"
 
-# zoxide provides the normal `z` command. Do not alias `cd=z`; that obscures
-# standard cd semantics and can create recursion with alternative init modes.
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh --cmd cd)"
+# zoxide and direnv emit stable shell code. Cache it and invalidate the cache
+# when the executable is updated.
+if (( $+commands[zoxide] )); then
+  _cache_init zoxide "${commands[zoxide]}" "${commands[zoxide]}" init zsh --cmd cd
 fi
 
 if (( $+commands[direnv] )); then
-  eval "$(direnv hook zsh)"
+  _cache_init direnv "${commands[direnv]}" "${commands[direnv]}" hook zsh
 fi
 
-# Cache Pixi completion instead of regenerating it on every shell startup.
+# Pixi completion is also generated code and can use the same cache path.
 if (( $+commands[pixi] )); then
-  _zsh_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-  _pixi_completion="$_zsh_cache_dir/pixi-completion.zsh"
-  mkdir -p "$_zsh_cache_dir"
-
-  if [[ ! -s "$_pixi_completion" || "${commands[pixi]}" -nt "$_pixi_completion" ]]; then
-    command pixi completion --shell zsh >| "$_pixi_completion" 2>/dev/null
-  fi
-  [[ -s "$_pixi_completion" ]] && source "$_pixi_completion"
-  unset _zsh_cache_dir _pixi_completion
+  _cache_init pixi-completion "${commands[pixi]}" "${commands[pixi]}" completion --shell zsh
 fi
 
 # Lazy-load Conda/Mamba. This avoids running a large shell hook in every new
@@ -203,10 +216,20 @@ sdk() {
   fi
 }
 
-# TheFuck no longer runs before Powerlevel10k's instant-prompt preamble and is
-# guarded so a missing executable does not print an error at startup.
+# TheFuck is relatively expensive to initialize and is usually not needed in
+# every pane. Generate its function only on the first `fuck` invocation.
 if (( $+commands[thefuck] )); then
-  eval "$(thefuck --alias)"
+  __load_thefuck() {
+    local thefuck_bin="${commands[thefuck]}"
+    unfunction fuck 2>/dev/null
+    eval "$("$thefuck_bin" --alias)" || return
+    unfunction __load_thefuck 2>/dev/null
+  }
+
+  fuck() {
+    __load_thefuck || return
+    fuck "$@"
+  }
 fi
 
 # -----------------------------------------------------------------------------
@@ -236,25 +259,24 @@ if (( $+commands[eza] )); then
 fi
 
 # Homebrew installs GNU compilers with versioned executable names such as
-# gcc-16 and g++-16. Select the highest installed numeric version dynamically,
-# so a future Homebrew upgrade does not require editing this file.
+# gcc-16 and g++-16. Derive the prefix from Zsh's command hash instead of
+# spawning `brew --prefix` on every shell startup.
 if (( $+commands[brew] )); then
-  _brew_prefix="$(command brew --prefix 2>/dev/null)"
-  if [[ -n "$_brew_prefix" ]]; then
-    typeset -a _brew_gcc_candidates _brew_gxx_candidates
-    _brew_gcc_candidates=("$_brew_prefix/bin"/gcc-<->(Nn))
-    _brew_gxx_candidates=("$_brew_prefix/bin"/g++-<->(Nn))
+  _brew_prefix="${commands[brew]:h:h}"
+  typeset -a _brew_gcc_candidates _brew_gxx_candidates
+  _brew_gcc_candidates=("$_brew_prefix/bin"/gcc-<->(Nn))
+  _brew_gxx_candidates=("$_brew_prefix/bin"/g++-<->(Nn))
 
-    if (( ${#_brew_gcc_candidates} )); then
-      export CC="${_brew_gcc_candidates[-1]}"
-      alias "gcc=${_brew_gcc_candidates[-1]}"
-    fi
-
-    if (( ${#_brew_gxx_candidates} )); then
-      export CXX="${_brew_gxx_candidates[-1]}"
-      alias "g++=${_brew_gxx_candidates[-1]}"
-    fi
+  if (( ${#_brew_gcc_candidates} )); then
+    export CC="${_brew_gcc_candidates[-1]}"
+    alias "gcc=${_brew_gcc_candidates[-1]}"
   fi
+
+  if (( ${#_brew_gxx_candidates} )); then
+    export CXX="${_brew_gxx_candidates[-1]}"
+    alias "g++=${_brew_gxx_candidates[-1]}"
+  fi
+
   unset _brew_prefix _brew_gcc_candidates _brew_gxx_candidates
 fi
 
@@ -317,11 +339,13 @@ gclone() {
 }
 
 # shellfirm 0.3+ wraps accept-line so a rejected command never reaches
-# preexec. Initialize it after the other widget providers and only when the
-# binary is installed.
+# preexec. Its generated init code is cacheable just like the integrations above.
 if (( $+commands[shellfirm] )); then
-  eval "$(shellfirm init zsh)"
+  _cache_init shellfirm "${commands[shellfirm]}" "${commands[shellfirm]}" init zsh
 fi
+
+unfunction _cache_init 2>/dev/null
+unset _zsh_cache_dir
 
 # zsh-syntax-highlighting must be sourced after every custom ZLE widget.
 _zsh_highlighting="$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
