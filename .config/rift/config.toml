@@ -1,0 +1,203 @@
+[settings]
+animate = true
+animation_duration = 0.11
+animation_fps = 120.0
+default_disable = false
+
+focus_follows_mouse = false
+mouse_follows_focus = false
+mouse_hides_on_focus = false
+
+auto_focus_blacklist = [
+  "com.apple.dock",
+  "com.apple.systemuiserver",
+  "com.apple.SecurityAgent",
+  "com.apple.Spotlight"
+]
+
+run_on_start = []
+hot_reload = true
+
+
+[settings.layout]
+mode = "scrolling"
+window_insertion_point = "next_to_selection"
+
+
+[settings.layout.traditional]
+equalize_nodes = true
+
+
+[settings.layout.master_stack]
+master_ratio = 0.62
+master_count = 1
+master_side = "left"
+new_window_placement = "stack"
+
+
+[settings.layout.scrolling]
+column_width_ratio = 0.48
+min_column_width_ratio = 0.28
+max_column_width_ratio = 1.00
+alignment = "center"
+focus_navigation_style = "niri"
+animate = true
+
+
+[settings.layout.scrolling.gestures]
+enabled = false
+invert_horizontal = false
+fingers = 3
+propagate_to_workspace_swipe = false
+
+
+[settings.layout.stack]
+stack_offset = 36.0
+default_orientation = "perpendicular"
+
+
+[settings.layout.gaps.outer]
+top = 8
+left = 8
+bottom = 8
+right = 8
+
+
+[settings.layout.gaps.inner]
+horizontal = 8
+vertical = 8
+
+
+[settings.ui.menu_bar]
+enabled = false
+show_empty = false
+mode = "active"
+active_label = "index"
+display_style = "label"
+layout_folder = "~/.config/rift/layouts"
+
+
+[settings.ui.stack_line]
+enabled = false
+hover = "hover"
+horiz_placement = "top"
+vert_placement = "left"
+thickness = 16.0
+spacing = 1.0
+
+
+[settings.ui.mission_control]
+enabled = false
+fade_enabled = false
+fade_duration_ms = 150.0
+
+
+[settings.gestures]
+enabled = false
+consume_dock_swipe = true
+invert_horizontal_swipe = false
+swipe_vertical_tolerance = 0.4
+skip_empty = true
+fingers = 3
+distance_pct = 0.08
+haptics_enabled = true
+haptic_pattern = "level_change"
+
+
+[settings.window_snapping]
+drag_swap_fraction = 0.30
+
+
+[virtual_workspaces]
+enabled = false
+default_workspace_count = 1
+default_workspace = 0
+
+auto_assign_windows = false
+preserve_focus_per_workspace = true
+workspace_auto_back_and_forth = false
+prevent_wrapping = true
+reapply_app_rules_on_title_change = false
+
+workspace_rules = []
+workspace_names = []
+
+app_rules = [
+  { ax_subrole = "AXDialog", floating = true },
+  { ax_subrole = "AXSystemDialog", floating = true },
+  { title_substring = "Preferences", floating = true },
+  { title_substring = "Settings", floating = true },
+  { app_id = "com.apple.systempreferences", manage = false },
+  { app_name = "Calculator", manage = false }
+]
+
+
+[keys]
+
+"OptionRight + Z" = "toggle_space_activated"
+
+
+"OptionRight + H" = { scroll_strip = { delta = -0.40 } }
+"OptionRight + L" = { scroll_strip = { delta = 0.40 } }
+
+"OptionRight + Shift + H" = { scroll_strip = { delta = -0.05 } }
+"OptionRight + Shift + L" = { scroll_strip = { delta = 0.05 } }
+
+"OptionRight + C" = "center_selection"
+"OptionRight + S" = "snap_strip"
+
+
+"OptionRight + Left" = { move_focus = "left" }
+"OptionRight + Down" = { move_focus = "down" }
+"OptionRight + Up" = { move_focus = "up" }
+"OptionRight + Right" = { move_focus = "right" }
+
+"OptionRight + Shift + Left" = { move_node = "left" }
+"OptionRight + Shift + Down" = { move_node = "down" }
+"OptionRight + Shift + Up" = { move_node = "up" }
+"OptionRight + Shift + Right" = { move_node = "right" }
+
+"OptionRight + Tab" = "next_window"
+"OptionRight + Shift + Tab" = "prev_window"
+
+
+"OptionRight + Equal" = "resize_window_grow"
+"OptionRight + Minus" = "resize_window_shrink"
+
+# Fine resize uses the fork's CLI directly.
+"OptionRight + LeftBracket" = { exec = ["/Users/josh/.local/bin/rift-cli", "execute", "window", "resize-by", "-0.005"] }
+"OptionRight + RightBracket" = { exec = ["/Users/josh/.local/bin/rift-cli", "execute", "window", "resize-by", "0.005"] }
+
+
+"OptionRight + N" = { set_workspace_layout = { mode = "scrolling" } }
+"OptionRight + B" = { set_workspace_layout = { mode = "bsp" } }
+"OptionRight + M" = { set_workspace_layout = { mode = "master_stack" } }
+"OptionRight + T" = { set_workspace_layout = { mode = "traditional" } }
+
+
+"OptionRight + Space" = "toggle_window_floating"
+"OptionRight + Shift + Space" = "toggle_focus_floating"
+
+"OptionRight + F" = "toggle_fullscreen"
+"OptionRight + Shift + F" = "toggle_fullscreen_within_gaps"
+
+
+"OptionRight + Ctrl + Left" = { join_window = "left" }
+"OptionRight + Ctrl + Right" = { join_window = "right" }
+"OptionRight + Ctrl + Up" = { join_window = "up" }
+"OptionRight + Ctrl + Down" = { join_window = "down" }
+
+"OptionRight + Comma" = "toggle_stack"
+"OptionRight + Slash" = "toggle_orientation"
+"OptionRight + Ctrl + E" = "unjoin_windows"
+
+
+# Save/restore only the current native macOS Space.
+# Notifications confirm whether the operation succeeded.
+"OptionRight + P" = { exec = ["/bin/zsh", "-lc", "mkdir -p ~/.config/rift/layouts; if /Users/josh/.local/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi"] }
+
+"OptionRight + O" = { exec = ["/bin/zsh", "-lc", "if /Users/josh/.local/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi"] }
+
+
+"OptionRight + Shift + D" = "debug"
+"OptionRight + Ctrl + S" = "serialize"

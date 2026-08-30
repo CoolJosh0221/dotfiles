@@ -1,0 +1,296 @@
+# ~/.config/rift/config.toml
+#
+# Rift scrolling layout for macOS.
+#
+# Key design:
+#   Option+H/L             = normal horizontal pan
+#   Option+Shift+H/L       = fine horizontal pan
+#   Option+=/-             = normal grow/shrink
+#   Option+Shift+=/-       = fine grow/shrink
+#   Ctrl+Option+H/J/K/L    = focus windows
+#   Ctrl+Option+Shift+H/J/K/L = reorder windows
+#
+# IMPORTANT:
+# - There are NO reusable modifier aliases in this file.
+#   This avoids Alt+Shift+H/L being accidentally expanded into move_node.
+# - Fine resize deliberately uses rift-cli through `exec`,
+#   because the installed Rift build previously panicked when
+#   resize_window_by was deserialized directly from TOML.
+
+[settings]
+animate = true
+animation_duration = 0.11
+animation_fps = 120.0
+
+default_disable = false
+
+focus_follows_mouse = false
+mouse_follows_focus = false
+mouse_hides_on_focus = false
+
+auto_focus_blacklist = [
+  "com.apple.dock",
+  "com.apple.systemuiserver",
+  "com.apple.SecurityAgent",
+  "com.apple.Spotlight"
+]
+
+run_on_start = []
+hot_reload = true
+
+
+# ============================================================
+# LAYOUT
+# ============================================================
+
+[settings.layout]
+mode = "scrolling"
+window_insertion_point = "next_to_selection"
+
+
+[settings.layout.scrolling]
+column_width_ratio = 0.48
+min_column_width_ratio = 0.28
+max_column_width_ratio = 1.00
+
+alignment = "center"
+focus_navigation_style = "niri"
+animate = true
+
+
+[settings.layout.scrolling.gestures]
+enabled = false
+invert_horizontal = false
+fingers = 3
+propagate_to_workspace_swipe = false
+
+
+[settings.layout.stack]
+stack_offset = 36.0
+default_orientation = "perpendicular"
+
+
+# ============================================================
+# GAPS
+# ============================================================
+
+[settings.layout.gaps.outer]
+top = 8
+left = 8
+bottom = 8
+right = 8
+
+[settings.layout.gaps.inner]
+horizontal = 8
+vertical = 8
+
+
+# ============================================================
+# UI
+# ============================================================
+
+[settings.ui.menu_bar]
+enabled = true
+show_empty = false
+mode = "active"
+active_label = "name"
+display_style = "label"
+layout_folder = "~/.config/rift/layouts"
+
+[settings.ui.stack_line]
+enabled = false
+thickness = 16.0
+horiz_placement = "top"
+vert_placement = "left"
+spacing = 1.0
+
+[settings.ui.mission_control]
+enabled = false
+fade_enabled = false
+fade_duration_ms = 150.0
+
+
+# ============================================================
+# WORKSPACE GESTURES / DRAGGING
+# ============================================================
+
+[settings.gestures]
+enabled = false
+consume_dock_swipe = true
+invert_horizontal_swipe = false
+skip_empty = true
+fingers = 3
+haptics_enabled = true
+
+[settings.window_snapping]
+drag_swap_fraction = 0.30
+
+
+# ============================================================
+# VIRTUAL WORKSPACES
+# ============================================================
+
+[virtual_workspaces]
+enabled = true
+default_workspace_count = 4
+default_workspace = 0
+
+auto_assign_windows = true
+preserve_focus_per_workspace = true
+workspace_auto_back_and_forth = false
+reapply_app_rules_on_title_change = false
+
+workspace_names = [
+  "Main",
+  "Research",
+  "Comms",
+  "Misc"
+]
+
+workspace_rules = [
+  { workspace = 0, layout = "scrolling" },
+  { workspace = 1, layout = "scrolling" },
+  { workspace = 2, layout = "scrolling" },
+  { workspace = 3, layout = "scrolling" }
+]
+
+app_rules = [
+  { ax_subrole = "AXDialog", floating = true },
+  { ax_subrole = "AXSystemDialog", floating = true },
+
+  # Leave these completely native/free.
+  { app_id = "com.apple.systempreferences", manage = false },
+  { app_name = "Calculator", manage = false }
+]
+
+
+# ============================================================
+# KEYBINDINGS
+# ============================================================
+
+[keys]
+
+# Toggle Rift management on the current macOS Space.
+"Alt + Z" = "toggle_space_activated"
+
+
+# ------------------------------------------------------------
+# HORIZONTAL STRIP PAN
+#
+# No Shift = normal movement.
+# Shift    = fine movement.
+# ------------------------------------------------------------
+
+"Alt + H" = { scroll_strip = { delta = -0.40 } }
+"Alt + L" = { scroll_strip = { delta = 0.40 } }
+
+"Alt + Shift + H" = { scroll_strip = { delta = -0.05 } }
+"Alt + Shift + L" = { scroll_strip = { delta = 0.05 } }
+
+# Bigger one-off pan.
+"Alt + Left" = { scroll_strip = { delta = -0.50 } }
+"Alt + Right" = { scroll_strip = { delta = 0.50 } }
+
+"Alt + C" = "center_selection"
+"Alt + S" = "snap_strip"
+
+
+# ------------------------------------------------------------
+# FOCUS WINDOWS
+# ------------------------------------------------------------
+
+"Ctrl + Alt + H" = { move_focus = "left" }
+"Ctrl + Alt + J" = { move_focus = "down" }
+"Ctrl + Alt + K" = { move_focus = "up" }
+"Ctrl + Alt + L" = { move_focus = "right" }
+
+
+# ------------------------------------------------------------
+# REORDER WINDOWS
+# ------------------------------------------------------------
+
+"Ctrl + Alt + Shift + H" = { move_node = "left" }
+"Ctrl + Alt + Shift + J" = { move_node = "down" }
+"Ctrl + Alt + Shift + K" = { move_node = "up" }
+"Ctrl + Alt + Shift + L" = { move_node = "right" }
+
+
+# ------------------------------------------------------------
+# WINDOW CYCLING
+# ------------------------------------------------------------
+
+"Alt + Tab" = "next_window"
+"Alt + Shift + Tab" = "prev_window"
+
+
+# ------------------------------------------------------------
+# RESIZE
+#
+# No Shift = normal/smart resize.
+# Shift    = fine resize (~0.5% of screen width per press).
+# ------------------------------------------------------------
+
+"Alt + Equal" = "resize_window_grow"
+"Alt + Minus" = "resize_window_shrink"
+
+"Alt + Shift + Equal" = { exec = ["/bin/zsh", "-lc", "rift-cli execute window resize-by 0.005 >/dev/null 2>&1"] }
+"Alt + Shift + Minus" = { exec = ["/bin/zsh", "-lc", "rift-cli execute window resize-by -0.005 >/dev/null 2>&1"] }
+
+
+# ------------------------------------------------------------
+# WORKSPACES
+# ------------------------------------------------------------
+
+"Alt + 1" = { switch_to_workspace = 0 }
+"Alt + 2" = { switch_to_workspace = 1 }
+"Alt + 3" = { switch_to_workspace = 2 }
+"Alt + 4" = { switch_to_workspace = 3 }
+
+# Move focused window to workspace.
+"Ctrl + Alt + 1" = { move_window_to_workspace = 0 }
+"Ctrl + Alt + 2" = { move_window_to_workspace = 1 }
+"Ctrl + Alt + 3" = { move_window_to_workspace = 2 }
+"Ctrl + Alt + 4" = { move_window_to_workspace = 3 }
+
+
+# ------------------------------------------------------------
+# STACK / JOIN
+# ------------------------------------------------------------
+
+"Ctrl + Alt + Left" = { join_window = "left" }
+"Ctrl + Alt + Right" = { join_window = "right" }
+"Ctrl + Alt + Up" = { join_window = "up" }
+"Ctrl + Alt + Down" = { join_window = "down" }
+
+"Alt + Comma" = "toggle_stack"
+"Alt + Slash" = "toggle_orientation"
+"Alt + Ctrl + E" = "unjoin_windows"
+
+
+# ------------------------------------------------------------
+# FLOATING / FULLSCREEN
+# ------------------------------------------------------------
+
+"Alt + Shift + Space" = "toggle_window_floating"
+
+"Alt + F" = "toggle_fullscreen"
+"Alt + Shift + F" = "toggle_fullscreen_within_gaps"
+
+
+# ------------------------------------------------------------
+# CLOSE / DEBUG
+# ------------------------------------------------------------
+
+"Alt + Q" = "close_window"
+
+"Alt + Shift + D" = "debug"
+"Alt + Ctrl + S" = "serialize"
+
+
+# ------------------------------------------------------------
+# LAYOUT SAVE / RESTORE
+# ------------------------------------------------------------
+
+"Alt + Ctrl + P" = { exec = ["/bin/zsh", "-lc", "rift-cli execute save-layout --master >/dev/null 2>&1"] }
+"Alt + Ctrl + O" = { exec = ["/bin/zsh", "-lc", "rift-cli execute load-layout --master >/dev/null 2>&1"] }
+"Alt + Ctrl + Q" = "save_and_exit"
