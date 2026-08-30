@@ -285,7 +285,7 @@ gget() {
   fi
 
   local url="$1"
-  local proxy='https://gh-proxy.com/'
+  local proxy='https://ghfast.top'
 
   case "$url" in
     https://gh-proxy.com/*|https://gh-proxy.org/*)
