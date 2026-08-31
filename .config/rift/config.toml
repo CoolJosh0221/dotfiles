@@ -9,10 +9,10 @@ mouse_follows_focus = false
 mouse_hides_on_focus = false
 
 auto_focus_blacklist = [
-  "com.apple.dock",
-  "com.apple.systemuiserver",
-  "com.apple.SecurityAgent",
-  "com.apple.Spotlight"
+    "com.apple.dock",
+    "com.apple.systemuiserver",
+    "com.apple.SecurityAgent",
+    "com.apple.Spotlight",
 ]
 
 run_on_start = []
@@ -123,12 +123,13 @@ workspace_rules = []
 workspace_names = []
 
 app_rules = [
-  { ax_subrole = "AXDialog", floating = true },
-  { ax_subrole = "AXSystemDialog", floating = true },
-  { title_substring = "Preferences", floating = true },
-  { title_substring = "Settings", floating = true },
-  { app_id = "com.apple.systempreferences", manage = false },
-  { app_name = "Calculator", manage = false }
+    { app_id = "com.vitalsource.bookshelf", title_substring = "Highlight Menu", manage = false },
+    { ax_subrole = "AXDialog", floating = true },
+    { ax_subrole = "AXSystemDialog", floating = true },
+    { title_substring = "Preferences", floating = true },
+    { title_substring = "Settings", floating = true },
+    { app_id = "com.apple.systempreferences", manage = false },
+    { app_name = "Calculator", manage = false },
 ]
 
 
@@ -165,8 +166,20 @@ app_rules = [
 "OptionRight + Minus" = "resize_window_shrink"
 
 # Fine resize uses the fork's CLI directly.
-"OptionRight + LeftBracket" = { exec = ["/Users/josh/.local/bin/rift-cli", "execute", "window", "resize-by", "-0.005"] }
-"OptionRight + RightBracket" = { exec = ["/Users/josh/.local/bin/rift-cli", "execute", "window", "resize-by", "0.005"] }
+"OptionRight + LeftBracket" = { exec = [
+    "/Users/josh/.local/bin/rift-cli",
+    "execute",
+    "window",
+    "resize-by",
+    "-0.005",
+] }
+"OptionRight + RightBracket" = { exec = [
+    "/Users/josh/.local/bin/rift-cli",
+    "execute",
+    "window",
+    "resize-by",
+    "0.005",
+] }
 
 
 "OptionRight + N" = { set_workspace_layout = { mode = "scrolling" } }
@@ -194,9 +207,17 @@ app_rules = [
 
 # Save/restore only the current native macOS Space.
 # Notifications confirm whether the operation succeeded.
-"OptionRight + P" = { exec = ["/bin/zsh", "-lc", "mkdir -p ~/.config/rift/layouts; if /Users/josh/.local/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi"] }
+"OptionRight + P" = { exec = [
+    "/bin/zsh",
+    "-lc",
+    "mkdir -p ~/.config/rift/layouts; if /Users/josh/.local/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
+] }
 
-"OptionRight + O" = { exec = ["/bin/zsh", "-lc", "if /Users/josh/.local/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi"] }
+"OptionRight + O" = { exec = [
+    "/bin/zsh",
+    "-lc",
+    "if /Users/josh/.local/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
+] }
 
 
 "OptionRight + Shift + D" = "debug"
