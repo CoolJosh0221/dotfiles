@@ -165,16 +165,16 @@ app_rules = [
 "OptionRight + Equal" = "resize_window_grow"
 "OptionRight + Minus" = "resize_window_shrink"
 
-# Fine resize uses the fork's CLI directly.
+# Fine resize uses Rift's CLI directly.
 "OptionRight + LeftBracket" = { exec = [
-    "/Users/josh/.local/bin/rift-cli",
+    "/opt/homebrew/bin/rift",
     "execute",
     "window",
     "resize-by",
     "-0.005",
 ] }
 "OptionRight + RightBracket" = { exec = [
-    "/Users/josh/.local/bin/rift-cli",
+    "/opt/homebrew/bin/rift",
     "execute",
     "window",
     "resize-by",
@@ -210,13 +210,13 @@ app_rules = [
 "OptionRight + P" = { exec = [
     "/bin/zsh",
     "-lc",
-    "mkdir -p ~/.config/rift/layouts; if /Users/josh/.local/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
+    "mkdir -p ~/.config/rift/layouts; if /opt/homebrew/bin/rift execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
 ] }
 
 "OptionRight + O" = { exec = [
     "/bin/zsh",
     "-lc",
-    "if /Users/josh/.local/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
+    "if /opt/homebrew/bin/rift execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
 ] }
 
 

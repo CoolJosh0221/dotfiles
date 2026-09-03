@@ -1,0 +1,10 @@
+-- Copy this file to local.lua for settings that should stay on one machine.
+-- local.lua is ignored by Git and is merged over preferences.lua.
+return {
+  appearance = {
+    -- transparent = true,
+  },
+  lazyvim = {
+    -- autoformat = false,
+  },
+}
