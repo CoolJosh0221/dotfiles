@@ -34,15 +34,15 @@ config.font = wezterm.font_with_fallback({
 		family = "IosevkaKanade Nerd Font SemiCondensed",
 		weight = 500,
 	},
-	{
-		family = "IosevkaKanade Nerd Font",
-		weight = 500,
-	},
+	-- {
+	-- 	family = "IosevkaKanade Nerd Font",
+	-- 	weight = 500,
+	-- },
 	"Noto Color Emoji",
 	"Noto Sans TC",
 })
-config.font_size = 16
-config.line_height = 1.1
+config.font_size = 15
+config.line_height = 1.15
 config.color_scheme = "tokyonight_moon"
 
 -- Borderless Linux-like window, but retain resize handles and the macOS shadow.
