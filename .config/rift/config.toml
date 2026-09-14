@@ -1,6 +1,6 @@
 [settings]
 animate = true
-animation_duration = 0.11
+animation_duration = 0.08
 animation_fps = 120.0
 default_disable = false
 
@@ -9,10 +9,10 @@ mouse_follows_focus = false
 mouse_hides_on_focus = false
 
 auto_focus_blacklist = [
-    "com.apple.dock",
-    "com.apple.systemuiserver",
-    "com.apple.SecurityAgent",
-    "com.apple.Spotlight",
+  "com.apple.dock",
+  "com.apple.systemuiserver",
+  "com.apple.SecurityAgent",
+  "com.apple.Spotlight",
 ]
 
 run_on_start = []
@@ -122,14 +122,16 @@ reapply_app_rules_on_title_change = false
 workspace_rules = []
 workspace_names = []
 
+# Exact unmanaged-app exceptions precede general dialog rules.
+# Avoid global Settings/Preferences title matches: normal documents and browser
+# windows can contain these words. Float other preferences windows manually
+# with Right Option + Space, or add an app-specific rule when needed.
 app_rules = [
-    { app_id = "com.vitalsource.bookshelf", title_substring = "Highlight Menu", manage = false },
-    { ax_subrole = "AXDialog", floating = true },
-    { ax_subrole = "AXSystemDialog", floating = true },
-    { title_substring = "Preferences", floating = true },
-    { title_substring = "Settings", floating = true },
-    { app_id = "com.apple.systempreferences", manage = false },
-    { app_name = "Calculator", manage = false },
+  { app_id = "com.vitalsource.bookshelf", title_substring = "Highlight Menu", manage = false },
+  { app_id = "com.apple.systempreferences", manage = false },
+  { app_id = "com.apple.calculator", manage = false },
+  { ax_subrole = "AXDialog", floating = true },
+  { ax_subrole = "AXSystemDialog", floating = true },
 ]
 
 
@@ -165,20 +167,26 @@ app_rules = [
 "OptionRight + Equal" = "resize_window_grow"
 "OptionRight + Minus" = "resize_window_shrink"
 
-# Fine resize uses Rift's CLI directly.
+# Resize the height of windows sharing a scrolling column.
+"OptionRight + Shift + Equal" = { resize_window_grow = "vertical" }
+"OptionRight + Shift + Minus" = { resize_window_shrink = "vertical" }
+
+# Fine resize uses the separate rift-cli executable (Rift 0.5.8.1).
+# -- ensures the negative amount is parsed as a positional argument.
 "OptionRight + LeftBracket" = { exec = [
-    "/opt/homebrew/bin/rift",
-    "execute",
-    "window",
-    "resize-by",
-    "-0.005",
+  "/opt/homebrew/bin/rift-cli",
+  "execute",
+  "window",
+  "resize-by",
+  "--",
+  "-0.005",
 ] }
 "OptionRight + RightBracket" = { exec = [
-    "/opt/homebrew/bin/rift",
-    "execute",
-    "window",
-    "resize-by",
-    "0.005",
+  "/opt/homebrew/bin/rift-cli",
+  "execute",
+  "window",
+  "resize-by",
+  "0.005",
 ] }
 
 
@@ -195,28 +203,29 @@ app_rules = [
 "OptionRight + Shift + F" = "toggle_fullscreen_within_gaps"
 
 
-"OptionRight + Ctrl + Left" = { join_window = "left" }
-"OptionRight + Ctrl + Right" = { join_window = "right" }
-"OptionRight + Ctrl + Up" = { join_window = "up" }
-"OptionRight + Ctrl + Down" = { join_window = "down" }
+"OptionRight + Ctrl + Left" = { consume_or_expel_window = "left" }
+"OptionRight + Ctrl + Right" = { consume_or_expel_window = "right" }
+"OptionRight + Ctrl + Up" = { consume_or_expel_window = "up" }
+"OptionRight + Ctrl + Down" = { consume_or_expel_window = "down" }
 
 "OptionRight + Comma" = "toggle_stack"
 "OptionRight + Slash" = "toggle_orientation"
 "OptionRight + Ctrl + E" = "unjoin_windows"
 
 
-# Save/restore only the current native macOS Space.
+# Save a layout snapshot; restore it to the current native macOS Space.
+# Each save replaces current-space.ron.
 # Notifications confirm whether the operation succeeded.
 "OptionRight + P" = { exec = [
-    "/bin/zsh",
-    "-lc",
-    "mkdir -p ~/.config/rift/layouts; if /opt/homebrew/bin/rift execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
+  "/bin/zsh",
+  "-lc",
+  "mkdir -p ~/.config/rift/layouts; if /opt/homebrew/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
 ] }
 
 "OptionRight + O" = { exec = [
-    "/bin/zsh",
-    "-lc",
-    "if /opt/homebrew/bin/rift execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
+  "/bin/zsh",
+  "-lc",
+  "if /opt/homebrew/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
 ] }
 
 
