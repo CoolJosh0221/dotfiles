@@ -5,12 +5,6 @@
 typeset -U path PATH
 typeset -a _preferred_paths
 
-# Zerobrew paths are declared before PATH construction so PATH is assembled once.
-export ZEROBREW_DIR="$HOME/.zerobrew"
-export ZEROBREW_BIN="$ZEROBREW_DIR/bin"
-export ZEROBREW_ROOT='/opt/zerobrew'
-export ZEROBREW_PREFIX='/opt/zerobrew'
-export PKG_CONFIG_PATH="$ZEROBREW_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
 # Prefer Homebrew's stable opt symlink for Java 17. This avoids spawning
 # /usr/libexec/java_home in the common case while still falling back to it.
@@ -30,8 +24,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export NVM_DIR="$HOME/.nvm"
 
 _preferred_paths=(
-  "$ZEROBREW_PREFIX/bin"
-  "$ZEROBREW_BIN"
   "$HOME/.local/bin"
   "$HOME/go/bin"
   "/opt/homebrew/bin"
@@ -99,29 +91,3 @@ if [[ -s "$NVM_DIR/nvm.sh" ]]; then
   }
 fi
 
-# SSL/TLS certificates (only if ca-certificates is installed).
-if [[ -z "${CURL_CA_BUNDLE:-}" || -z "${SSL_CERT_FILE:-}" ]]; then
-  if [[ -f "$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem" ]]; then
-    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
-    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/opt/ca-certificates/share/ca-certificates/cacert.pem"
-  elif [[ -f "$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem" ]]; then
-    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
-    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/ca-certificates/cacert.pem"
-  elif [[ -f "$ZEROBREW_PREFIX/etc/openssl/cert.pem" ]]; then
-    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
-    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/etc/openssl/cert.pem"
-  elif [[ -f "$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem" ]]; then
-    [[ -z "${CURL_CA_BUNDLE:-}" ]] && export CURL_CA_BUNDLE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
-    [[ -z "${SSL_CERT_FILE:-}" ]] && export SSL_CERT_FILE="$ZEROBREW_PREFIX/share/ca-certificates/cacert.pem"
-  fi
-fi
-
-if [[ -z "${SSL_CERT_DIR:-}" ]]; then
-  if [[ -d "$ZEROBREW_PREFIX/etc/ca-certificates" ]]; then
-    export SSL_CERT_DIR="$ZEROBREW_PREFIX/etc/ca-certificates"
-  elif [[ -d "$ZEROBREW_PREFIX/etc/openssl/certs" ]]; then
-    export SSL_CERT_DIR="$ZEROBREW_PREFIX/etc/openssl/certs"
-  elif [[ -d "$ZEROBREW_PREFIX/share/ca-certificates" ]]; then
-    export SSL_CERT_DIR="$ZEROBREW_PREFIX/share/ca-certificates"
-  fi
-fi

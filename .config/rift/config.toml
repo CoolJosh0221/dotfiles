@@ -1,6 +1,6 @@
 [settings]
 animate = true
-animation_duration = 0.08
+animation_duration = 0.20
 animation_fps = 120.0
 default_disable = false
 
@@ -57,15 +57,15 @@ default_orientation = "perpendicular"
 
 
 [settings.layout.gaps.outer]
-top = 8
-left = 8
-bottom = 8
-right = 8
+top = 10
+left = 10
+bottom = 10
+right = 10
 
 
 [settings.layout.gaps.inner]
-horizontal = 8
-vertical = 8
+horizontal = 14
+vertical = 14
 
 
 [settings.ui.menu_bar]
