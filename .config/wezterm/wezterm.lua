@@ -47,8 +47,8 @@ config.color_scheme = "tokyonight_moon"
 
 -- Borderless Linux-like window, but retain resize handles and the macOS shadow.
 config.window_decorations = "RESIZE|MACOS_FORCE_ENABLE_SHADOW"
-config.window_background_opacity = 0.85
-config.macos_window_background_blur = 10
+config.window_background_opacity = 0.80
+config.macos_window_background_blur = 5
 config.window_padding = {
 	left = 12,
 	right = 14,
@@ -59,8 +59,8 @@ config.window_padding = {
 config.default_cursor_style = "SteadyBlock"
 config.hide_mouse_cursor_when_typing = true
 config.inactive_pane_hsb = {
-	saturation = 0.9,
-	brightness = 0.45,
+	saturation = 0.95,
+	brightness = 0.75,
 }
 
 config.enable_scroll_bar = true
