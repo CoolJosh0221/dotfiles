@@ -1,6 +1,7 @@
 [settings]
+# Keep animated movement with shorter ordinary transitions.
 animate = true
-animation_duration = 0.20
+animation_duration = 0.12
 animation_fps = 120.0
 default_disable = false
 
@@ -171,22 +172,9 @@ app_rules = [
 "OptionRight + Shift + Equal" = { resize_window_grow = "vertical" }
 "OptionRight + Shift + Minus" = { resize_window_shrink = "vertical" }
 
-# Fine resize uses the locally built CLI matching the Rift service.
-# --amount= accepts negative values with the current upstream CLI.
-"OptionRight + LeftBracket" = { exec = [
-  "/Users/josh/.local/bin/rift-cli",
-  "execute",
-  "window",
-  "resize-by",
-  "--amount=-0.005",
-] }
-"OptionRight + RightBracket" = { exec = [
-  "/Users/josh/.local/bin/rift-cli",
-  "execute",
-  "window",
-  "resize-by",
-  "--amount=0.005",
-] }
+# Fine resize runs directly in Rift, without launching a CLI process.
+"OptionRight + LeftBracket" = { resize_window_by = { amount = -0.005 } }
+"OptionRight + RightBracket" = { resize_window_by = { amount = 0.005 } }
 
 
 "OptionRight + N" = { set_workspace_layout = { mode = "scrolling" } }
@@ -218,13 +206,13 @@ app_rules = [
 "OptionRight + P" = { exec = [
   "/bin/zsh",
   "-lc",
-  "mkdir -p ~/.config/rift/layouts; if /Users/josh/.local/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
+  "mkdir -p ~/.config/rift/layouts; if /opt/homebrew/bin/rift-cli execute save-layout ~/.config/rift/layouts/current-space.ron; then osascript -e 'display notification \"Current Space layout saved\" with title \"Rift\"'; else osascript -e 'display notification \"Layout save FAILED\" with title \"Rift\"'; fi",
 ] }
 
 "OptionRight + O" = { exec = [
   "/bin/zsh",
   "-lc",
-  "if /Users/josh/.local/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
+  "if /opt/homebrew/bin/rift-cli execute load-layout ~/.config/rift/layouts/current-space.ron --scope space; then osascript -e 'display notification \"Current Space layout restored\" with title \"Rift\"'; else osascript -e 'display notification \"Layout restore FAILED\" with title \"Rift\"'; fi",
 ] }
 
 
