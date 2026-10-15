@@ -5,7 +5,7 @@ options=(
   style=round
 
   # Strong enough to identify instantly on the Retina display.
-  width=8
+  width=12
   hidpi=on
 
   # Better focus detection alongside a window manager.
@@ -13,8 +13,8 @@ options=(
 
   # Vibrant cyan → magenta-purple.
   # active_color='glow(0xffff3df2)'
-  active_color='glow(0xffff21e6)'
-  # active_color='gradient(top_left=0xff22d3ee,bottom_right=0xffd946ef)'
+  # active_color='glow(0xffff21e6)'
+  active_color='gradient(top_left=0xff22d3ee,bottom_right=0xffd946ef)'
   # active_color='gradient(top_left=0xff00f0ff,bottom_right=0xffff21e6)'
 
   # Very faint cool inactive outline.
