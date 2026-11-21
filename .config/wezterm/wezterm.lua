@@ -41,7 +41,7 @@ config.font = wezterm.font_with_fallback({
 	"Noto Color Emoji",
 	"Noto Sans TC",
 })
-config.font_size = 15
+config.font_size = 16
 config.line_height = 1.15
 config.color_scheme = "tokyonight_moon"
 

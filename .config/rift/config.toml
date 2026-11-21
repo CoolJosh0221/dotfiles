@@ -37,7 +37,7 @@ new_window_placement = "stack"
 
 
 [settings.layout.scrolling]
-column_width_ratio = 0.48
+column_width_ratio = 0.45
 min_column_width_ratio = 0.28
 max_column_width_ratio = 1.00
 alignment = "center"
@@ -47,8 +47,8 @@ animate = true
 
 [settings.layout.scrolling.gestures]
 enabled = false
-invert_horizontal = false
-fingers = 3
+invert_horizontal = true
+fingers = 5
 propagate_to_workspace_swipe = false
 
 
@@ -70,27 +70,32 @@ vertical = 13
 
 
 [settings.ui.menu_bar]
-enabled = false
-show_empty = false
+enabled = true
+show_empty = true
+show_binding_mode = true
 mode = "active"
 active_label = "index"
-display_style = "label"
+# A compact preview of the active layout in the menu bar.
+display_style = "layout"
 layout_folder = "~/.config/rift/layouts"
+show_fullscreen_indicator = true
 
 
 [settings.ui.stack_line]
-enabled = false
+enabled = true
+# Highlight on hover; click a tab to select its window.
 hover = "hover"
 horiz_placement = "top"
 vert_placement = "left"
-thickness = 16.0
-spacing = 1.0
+thickness = 28.0
+spacing = 2.0
 
 
 [settings.ui.mission_control]
-enabled = false
+# Enabling the overview requires restarting Rift.
+enabled = true
+show_empty_workspaces = false
 fade_enabled = false
-fade_duration_ms = 150.0
 
 
 [settings.gestures]
@@ -128,17 +133,20 @@ workspace_names = []
 # windows can contain these words. Float other preferences windows manually
 # with Right Option + Space, or add an app-specific rule when needed.
 app_rules = [
-  { app_id = "com.vitalsource.bookshelf", title_substring = "Highlight Menu", manage = false },
+	{ app_id = "com.vitalsource.bookshelf", floating = false, focus = false, manage = false, title_substring = "Highlight Menu" },
   { app_id = "com.apple.systempreferences", manage = false },
   { app_id = "com.apple.calculator", manage = false },
-  { ax_subrole = "AXDialog", floating = true },
-  { ax_subrole = "AXSystemDialog", floating = true },
+	{ ax_subrole = "AXDialog", floating = true, focus = false },
+	{ ax_subrole = "AXSystemDialog", floating = true, focus = false }
 ]
 
 
 [keys]
 
 "OptionRight + Z" = "toggle_space_activated"
+
+# Open Rift's window overview.
+"OptionRight + G" = "show_mission_control_all"
 
 
 "OptionRight + H" = { scroll_strip = { delta = -0.40 } }
