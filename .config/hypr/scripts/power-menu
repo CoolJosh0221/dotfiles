@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+if command -v wlogout >/dev/null 2>&1; then
+    exec wlogout --buttons-per-row 5
+fi
+
+# Keep the old lightweight menu as a recovery path if wlogout is unavailable.
+config="$HOME/.config/hypr/fuzzel/power.ini"
+choice=$(printf '%s\n' "󰌾  Lock" "󰍃  Log out" "󰤄  Suspend" "󰜉  Restart" "󰐥  Shut down" |
+    fuzzel --config="$config" --dmenu --cache=/dev/null) || exit 0
+
+case "$choice" in
+    "󰌾  Lock") exec "$HOME/.config/hypr/scripts/power-action" lock ;;
+    "󰍃  Log out") exec "$HOME/.config/hypr/scripts/power-action" logout ;;
+    "󰤄  Suspend") exec "$HOME/.config/hypr/scripts/power-action" suspend ;;
+    "󰜉  Restart") exec "$HOME/.config/hypr/scripts/power-action" reboot ;;
+    "󰐥  Shut down") exec "$HOME/.config/hypr/scripts/power-action" shutdown ;;
+esac

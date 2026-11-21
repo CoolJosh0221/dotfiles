@@ -1,0 +1,34 @@
+[general]
+fullscreen = "current-screen"
+resize = { mode = "smart" }
+floating-hack = true
+auto-copy = false
+early-exit = ["copy", "save"]
+corner-roundness = 12
+initial-tool = "arrow"
+copy-command = "wl-copy"
+annotation-size-factor = 1
+save-after-copy = true
+default-hide-toolbars = false
+focus-toggles-toolbars = false
+default-fill-shapes = false
+default-round-caps = true
+primary-highlighter = "block"
+disable-notifications = false
+actions-on-right-click = ["save-to-clipboard", "save-to-file", "exit"]
+actions-on-enter = ["save-to-clipboard", "save-to-file", "exit"]
+actions-on-escape = ["exit"]
+no-window-decoration = true
+brush-smooth-history-size = 5
+pan-step-size = 50.0
+zoom-factor = 1.1
+text-move-length = 25.0
+input-scale = 1.0
+title = "Annotate screenshot"
+app-id = "org.satty.satty"
+notification-thumbnail = "screenshot"
+
+[font]
+family = "Hanken Grotesk"
+style = "Regular"
+fallback = ["Noto Sans CJK TC", "Noto Sans CJK JP"]

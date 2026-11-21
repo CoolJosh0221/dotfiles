@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+case ${1:-} in
+    off)
+        hyprctl eval 'hl.config({ decoration = { blur = { enabled = false }, shadow = { enabled = false } }, animations = { enabled = false } })'
+        ;;
+    on)
+        hyprctl reload
+        ;;
+    *)
+        printf 'usage: %s {off|on}\n' "$0" >&2
+        exit 2
+        ;;
+esac

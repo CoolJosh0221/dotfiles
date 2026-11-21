@@ -1,0 +1,55 @@
+#!/bin/sh
+set -eu
+
+config_dir="$HOME/.config/hypr"
+font_file="$config_dir/fontconfig-ui-font.conf"
+export FONTCONFIG_FILE="$config_dir/fontconfig-hyprland.conf"
+
+if [ "$#" -gt 0 ]; then
+    family=$*
+else
+    family=$(fc-list -f '%{family[0]}\n' | sort -fu |
+        fuzzel --config="$config_dir/fuzzel/fuzzel.ini" --dmenu --cache=/dev/null \
+            --no-icons --lines=10 --prompt="  Font  " --placeholder="Choose the Hyprland UI font") || exit 0
+fi
+
+[ -n "$family" ] || exit 0
+
+if ! fc-list -f '%{family[0]}\n' | grep -Fqx -- "$family"; then
+    printf 'Font family not found: %s\n' "$family" >&2
+    exit 1
+fi
+
+xml_family=$(printf '%s' "$family" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+temporary=$(mktemp "$config_dir/.fontconfig-ui-font.conf.XXXXXX")
+trap 'rm -f "$temporary"' EXIT HUP INT TERM
+
+{
+    printf '%s\n' '<?xml version="1.0"?>'
+    printf '%s\n' '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">'
+    printf '%s\n' '<fontconfig>'
+    printf '%s\n' '  <!-- Managed by scripts/set-ui-font. The first family is the current choice. -->'
+    printf '%s\n' '  <alias binding="strong">'
+    printf '%s\n' '    <family>Hyprland UI</family>'
+    printf '    <prefer><family>%s</family><family>Noto Sans</family></prefer>\n' "$xml_family"
+    printf '%s\n' '  </alias>'
+    for generic in sans-serif system-ui ui-sans-serif; do
+        printf '%s\n' '  <alias binding="strong">'
+        printf '    <family>%s</family>\n' "$generic"
+        printf '    <prefer><family>%s</family></prefer>\n' "$xml_family"
+        printf '%s\n' '  </alias>'
+    done
+    printf '%s\n' '</fontconfig>'
+} > "$temporary"
+
+xmllint --noout "$temporary"
+chmod 0644 "$temporary"
+mv -f "$temporary" "$font_file"
+trap - EXIT HUP INT TERM
+
+pkill -USR2 -x waybar 2>/dev/null || true
+swaync-client -R 2>/dev/null || true
+swaync-client -rs 2>/dev/null || true
+makoctl reload 2>/dev/null || true
+hyprctl reload 2>/dev/null || true
+notify-send "UI font changed" "$family — restart open applications if their text is unchanged."

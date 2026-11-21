@@ -351,3 +351,5 @@ unset _zsh_cache_dir
 _zsh_highlighting="$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 [[ -r "$_zsh_highlighting" ]] && source "$_zsh_highlighting"
 unset _zsh_highlighting
+
+ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519

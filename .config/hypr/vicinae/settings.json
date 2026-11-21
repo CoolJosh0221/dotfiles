@@ -1,0 +1,66 @@
+// This configuration is merged with the default vicinae configuration file, which you can obtain by running the `vicinae config default` command.
+// Every item defined in this file takes precedence over the values defined in the default config or any other imported file.
+//
+// You can make manual edits to this file, however you should keep in mind that this file may be written to by vicinae when a configuration change is made through the GUI.
+// When that happens, any custom comments or formatting will be lost.
+//
+// If you want to maintain a configuration file with your own comments and formatting, you should create a separate file and add it to the 'imports' array.
+//
+// Learn more about configuration at https://docs.vicinae.com/config
+
+{
+   "$schema": "https://vicinae.com/schemas/config.json",
+   "pop_to_root_on_close": true,
+   "activate_on_single_click": true,
+   "favicon_service": "none",
+   "search_files_in_root": false,
+   "input_server": {
+      "enabled": false
+   },
+   "tray": {
+      "enabled": false
+   },
+   "font": {
+      "rendering": "native",
+      "normal": {
+         "family": "Hanken Grotesk",
+         "size": 13
+      }
+   },
+   "theme": {
+      "light": {
+         "name": "tokyo-night-moon",
+         "icon_theme": "Tela-circle-purple-dark"
+      },
+      "dark": {
+         "name": "tokyo-night-moon",
+         "icon_theme": "Tela-circle-purple-dark"
+      }
+   },
+   "telemetry": {
+      "system_info": false
+   },
+   "launcher_window": {
+      "rounding": 18,
+      "opacity": 0.7,
+      "client_side_decorations": {
+         "enabled": true,
+         "border_width": 1,
+         "shadow_size": 12
+      },
+      "size": {
+         "width": 900,
+         "height": 560
+      },
+      "compact_mode": {
+         "enabled": false
+      },
+      "layer_shell": {
+         "layer": "top",
+         "keyboard_interactivity": "on_demand",
+         "enabled": true
+      },
+      "material": "blur"
+   },
+   "fallbacks": []
+}

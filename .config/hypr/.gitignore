@@ -1,0 +1,8 @@
+# Machine-local recovery and task records.
+backups/
+findings.md
+progress.md
+task_plan.md
+
+# Keep personal/large wallpaper files local. wallpapers/README.md remains tracked.
+wallpapers/current.*

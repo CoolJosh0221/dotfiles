@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+if command -v swaync >/dev/null 2>&1; then
+    exec swaync
+fi
+
+exec mako

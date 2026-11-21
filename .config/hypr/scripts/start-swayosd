@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+command -v swayosd-server >/dev/null 2>&1 || exit 0
+pgrep -u "$(id -u)" -x swayosd-server >/dev/null 2>&1 && exit 0
+exec swayosd-server

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# MEGAsync 6.6.2's emulated tray popup cannot reliably position or retain
+# focus under Wayland. In Hyprland, expose it as a normal native-Wayland
+# window; rules.lua then places it predictably. Plasma keeps MEGA's defaults.
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  exec env \
+    QT_QPA_PLATFORM=wayland \
+    DO_NOT_UNSET_XDG_SESSION_TYPE=1 \
+    USE_MEGASYNC_AS_REGULAR_WINDOW=1 \
+    megasync "$@"
+fi
+
+case ";${XDG_CURRENT_DESKTOP:-};${XDG_SESSION_DESKTOP:-}" in
+  *Hyprland*|*hyprland*)
+    exec env \
+      QT_QPA_PLATFORM=wayland \
+      DO_NOT_UNSET_XDG_SESSION_TYPE=1 \
+      USE_MEGASYNC_AS_REGULAR_WINDOW=1 \
+      megasync "$@"
+    ;;
+  *)
+    exec megasync "$@"
+    ;;
+esac

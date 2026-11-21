@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+hyprctl dispatch 'hl.dsp.focus({ workspace = "emptynm" })'

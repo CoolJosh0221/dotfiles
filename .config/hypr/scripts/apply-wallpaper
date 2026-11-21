@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+wallpaper_dir="$HOME/.config/hypr/wallpapers"
+wallpaper=""
+
+for candidate in \
+    "$wallpaper_dir/current.jpg" \
+    "$wallpaper_dir/current.jpeg" \
+    "$wallpaper_dir/current.png" \
+    "$wallpaper_dir/current.webp"; do
+    if [ -f "$candidate" ]; then
+        wallpaper="$candidate"
+        break
+    fi
+done
+
+# A solid #222436 background is the deliberate fallback.
+[ -n "$wallpaper" ] || exit 0
+
+attempt=0
+while ! hyprctl hyprpaper listactive >/dev/null 2>&1; do
+    attempt=$((attempt + 1))
+    [ "$attempt" -lt 20 ] || exit 1
+    sleep 0.1
+done
+
+# Preserve the whole composition without bars. The current image is already
+# close to 3440:1440, so fill needs only about 2.35% horizontal stretching.
+exec hyprctl hyprpaper wallpaper ",$wallpaper,fill"

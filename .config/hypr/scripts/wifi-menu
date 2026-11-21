@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+if [ ! -x /usr/bin/networkmanager_dmenu ]; then
+    notify-send "Wi-Fi menu unavailable" "Install networkmanager-dmenu with pacman."
+    exit 1
+fi
+
+# Prevent repeated clicks from opening competing menus.
+exec 9>"${XDG_RUNTIME_DIR:?}/hypr-wifi-menu.lock"
+flock -n 9 || exit 0
+
+# Use Arch's Python with PyGObject, even when a Conda environment is active.
+exec /usr/bin/python3 /usr/bin/networkmanager_dmenu \
+    --config "$HOME/.config/hypr/networkmanager-dmenu/config.ini"

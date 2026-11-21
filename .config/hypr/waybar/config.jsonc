@@ -1,0 +1,165 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 38,
+  "spacing": 8,
+  "margin-top": 10,
+  "margin-left": 12,
+  "margin-right": 12,
+
+  "modules-left": ["group/navigation"],
+  "modules-center": ["clock"],
+  "modules-right": ["group/status"],
+
+  "group/navigation": {
+    "orientation": "horizontal",
+    "modules": ["hyprland/workspaces", "custom/new-workspace", "custom/window-shelf", "hyprland/window"]
+  },
+
+  "group/status": {
+    "orientation": "horizontal",
+    "modules": ["group/hardware", "group/connectivity", "privacy", "custom/notification", "tray", "custom/power"]
+  },
+
+  "group/hardware": {
+    "orientation": "horizontal",
+    "modules": ["cpu", "memory", "custom/nvidia"]
+  },
+
+  "group/connectivity": {
+    "orientation": "horizontal",
+    "modules": ["custom/wifi-off", "bluetooth", "pulseaudio"]
+  },
+
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "sort-by": "number"
+  },
+
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 48,
+    "separate-outputs": true
+  },
+
+  "custom/new-workspace": {
+    "format": "+",
+    "tooltip-format": "New workspace · Super+0",
+    "on-click": "$HOME/.config/hypr/scripts/new-workspace"
+  },
+
+  "custom/window-shelf": {
+    "format": "󰖲",
+    "tooltip-format": "Window shelf · left: show/hide · right: park active window\nSuper+M parks · Super+Shift+M shows/hides",
+    "on-click": "$HOME/.config/hypr/scripts/window-shelf toggle",
+    "on-click-right": "$HOME/.config/hypr/scripts/window-shelf park"
+  },
+
+  "clock": {
+    "interval": 60,
+    "format": "{:%a %d · %H:%M}",
+    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "weeks-pos": "right"
+    }
+  },
+
+  "cpu": {
+    "interval": 5,
+    "format": "CPU {usage}%",
+    "tooltip": false
+  },
+
+  "memory": {
+    "interval": 5,
+    "format": "MEM {percentage}%",
+    "tooltip-format": "{used:0.1f} GiB used"
+  },
+
+  "custom/nvidia": {
+    "exec": "$HOME/.config/hypr/scripts/nvidia-status",
+    "interval": 10,
+    "hide-empty-text": true,
+    "tooltip": false
+  },
+
+  "custom/wifi-off": {
+    "exec": "if [ \"$(LC_ALL=C nmcli radio wifi)\" = disabled ]; then printf '󰖪  Wi-Fi off'; fi",
+    "interval": 5,
+    "hide-empty-text": true,
+    "tooltip-format": "Wi-Fi is off · click to enable\nUse the network tray icon to choose a network",
+    "on-click": "nmcli radio wifi on"
+  },
+
+  "bluetooth": {
+    "format": "󰂯",
+    "format-disabled": "󰂲",
+    "format-connected": "󰂱 {num_connections}",
+    "tooltip-format": "Bluetooth: {status}",
+    "tooltip-format-connected": "{device_enumerate}",
+    "on-click": "blueman-manager"
+  },
+
+  "pulseaudio": {
+    "scroll-step": 5,
+    "format": "{icon} {volume}%",
+    "format-muted": "󰝟 muted",
+    "format-icons": {
+      "default": ["󰕿", "󰖀", "󰕾"]
+    },
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "privacy": {
+    "icon-size": 16,
+    "icon-spacing": 5,
+    "transition-duration": 120,
+    "ignore-monitor": true,
+    "modules": [
+      {
+        "type": "screenshare",
+        "tooltip": true,
+        "tooltip-icon-size": 20
+      },
+      {
+        "type": "audio-in",
+        "tooltip": true,
+        "tooltip-icon-size": 20
+      }
+    ]
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 8
+  },
+
+  "custom/notification": {
+    "tooltip": true,
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "󱅫",
+      "none": "󰂚",
+      "dnd-notification": "󰂛",
+      "dnd-none": "󰂛",
+      "inhibited-notification": "󰂛",
+      "inhibited-none": "󰂛",
+      "dnd-inhibited-notification": "󰂛",
+      "dnd-inhibited-none": "󰂛"
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+
+  "custom/power": {
+    "format": "⏻",
+    "tooltip-format": "Power menu",
+    "on-click": "$HOME/.config/hypr/scripts/power-menu"
+  }
+}

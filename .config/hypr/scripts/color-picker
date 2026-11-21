@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+if ! command -v hyprpicker >/dev/null 2>&1; then
+    notify-send -u low "Color picker unavailable" "Install the stable hyprpicker package."
+    exit 1
+fi
+
+exec hyprpicker --autocopy --notify --lowercase-hex

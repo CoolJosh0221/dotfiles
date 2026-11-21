@@ -1,0 +1,49 @@
+{
+  "ignore-gtk-theme": true,
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "control-center-margin-top": 58,
+  "control-center-margin-bottom": 12,
+  "control-center-margin-right": 12,
+  "control-center-margin-left": 12,
+  "notification-window-width": 420,
+  "control-center-width": 430,
+  "control-center-height": 720,
+  "notification-icon-size": 52,
+  "notification-body-image-height": 100,
+  "notification-body-image-width": 200,
+  "timeout": 6,
+  "timeout-low": 4,
+  "timeout-critical": 0,
+  "fit-to-screen": false,
+  "keyboard-shortcuts": true,
+  "image-visibility": "when-available",
+  "transition-time": 140,
+  "hide-on-clear": true,
+  "hide-on-action": true,
+  "notification-grouping": true,
+  "script-fail-notify": true,
+  "widgets": [
+    "title",
+    "dnd",
+    "mpris",
+    "notifications"
+  ],
+  "widget-config": {
+    "title": {
+      "text": "Notifications",
+      "clear-all-button": true,
+      "button-text": "Clear"
+    },
+    "dnd": {
+      "text": "Do not disturb"
+    },
+    "mpris": {
+      "show-album-art": "when-available",
+      "autohide": true,
+      "loop-carousel": false
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "label": "lock",
+  "action": "/home/hosh/.config/hypr/scripts/power-action lock",
+  "text": "Lock",
+  "keybind": "l"
+}
+{
+  "label": "suspend",
+  "action": "/home/hosh/.config/hypr/scripts/power-action suspend",
+  "text": "Suspend",
+  "keybind": "u"
+}
+{
+  "label": "logout",
+  "action": "/home/hosh/.config/hypr/scripts/power-action logout",
+  "text": "Log out",
+  "keybind": "e"
+}
+{
+  "label": "reboot",
+  "action": "/home/hosh/.config/hypr/scripts/power-action reboot",
+  "text": "Restart",
+  "keybind": "r"
+}
+{
+  "label": "shutdown",
+  "action": "/home/hosh/.config/hypr/scripts/power-action shutdown",
+  "text": "Shut down",
+  "keybind": "s"
+}

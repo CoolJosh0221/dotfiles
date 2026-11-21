@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+# Vicinae is the primary command launcher; Fuzzel is the zero-daemon fallback.
+if command -v vicinae >/dev/null 2>&1 && vicinae ping >/dev/null 2>&1; then
+    exec vicinae toggle
+fi
+
+exec fuzzel

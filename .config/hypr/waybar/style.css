@@ -1,0 +1,188 @@
+* {
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  font-family: "Hyprland UI", "JetBrainsMono Nerd Font";
+  font-size: 12px;
+  font-weight: 500;
+}
+
+window#waybar {
+  background: transparent;
+  color: #c8d3f5;
+}
+
+/* Three floating glass islands: navigation, time, and status. */
+#navigation,
+#clock,
+#status {
+  min-height: 36px;
+  padding: 0 8px;
+  background: rgba(30, 32, 48, 0.86);
+  border: 1px solid rgba(68, 74, 115, 0.62);
+  border-radius: 12px;
+  box-shadow: 0 5px 16px rgba(17, 18, 29, 0.30);
+}
+
+#navigation {
+  padding-left: 5px;
+}
+
+#status {
+  padding-right: 5px;
+}
+
+#workspaces {
+  padding: 0;
+}
+
+#workspaces button {
+  min-width: 26px;
+  margin: 4px 2px;
+  padding: 0 7px;
+  color: #7a88cf;
+  background: transparent;
+  border-radius: 8px;
+  transition: all 120ms ease;
+}
+
+#workspaces button:hover {
+  color: #86e1fc;
+  background: rgba(47, 51, 77, 0.82);
+}
+
+#workspaces button.active {
+  color: #1e2030;
+  background: linear-gradient(100deg, #82aaff, #c099ff);
+  box-shadow: 0 0 10px rgba(130, 170, 255, 0.24);
+}
+
+#workspaces button.urgent {
+  color: #1e2030;
+  background: #ff757f;
+}
+
+#custom-new-workspace {
+  min-width: 24px;
+  margin: 5px 4px;
+  padding: 0 2px;
+  color: #c099ff;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+#custom-new-workspace:hover {
+  color: #1e2030;
+  background: #c099ff;
+}
+
+#custom-window-shelf {
+  min-width: 24px;
+  margin: 5px 1px;
+  padding: 0 4px;
+  color: #7a88cf;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+#custom-window-shelf:hover {
+  color: #1e2030;
+  background: #82aaff;
+}
+
+#window {
+  margin-left: 5px;
+  padding: 0 7px;
+  color: #7a88cf;
+}
+
+#clock {
+  padding: 0 15px;
+  color: #c8d3f5;
+  border-color: rgba(130, 170, 255, 0.62);
+}
+
+#hardware,
+#connectivity {
+  padding: 0 2px;
+  background: transparent;
+}
+
+#cpu,
+#memory,
+#custom-nvidia,
+#custom-wifi-off,
+#bluetooth,
+#pulseaudio,
+#privacy,
+#custom-notification,
+#tray,
+#custom-power {
+  margin: 0;
+  padding: 0 7px;
+  background: transparent;
+}
+
+#cpu,
+#memory,
+#custom-nvidia {
+  color: #86e1fc;
+}
+
+#bluetooth,
+#pulseaudio {
+  color: #82aaff;
+}
+
+#pulseaudio.muted,
+#custom-wifi-off,
+#bluetooth.disabled {
+  color: #7a88cf;
+}
+
+#privacy {
+  margin: 4px 1px;
+  padding: 0 6px;
+  background: rgba(255, 199, 119, 0.13);
+  border: 1px solid rgba(255, 199, 119, 0.52);
+  border-radius: 8px;
+}
+
+#privacy-item.screenshare {
+  color: #ffc777;
+}
+
+#privacy-item.audio-in {
+  color: #ff757f;
+}
+
+#custom-notification {
+  color: #c099ff;
+  font-size: 15px;
+}
+
+#custom-notification.notification {
+  color: #ffc777;
+}
+
+#custom-power {
+  min-width: 24px;
+  margin: 4px 1px 4px 4px;
+  padding: 0 5px;
+  color: #ff757f;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+#custom-power:hover {
+  color: #1e2030;
+  background: #ff757f;
+}
+
+tooltip {
+  padding: 9px;
+  color: #c8d3f5;
+  background: rgba(30, 32, 48, 0.97);
+  border: 1px solid #444a73;
+  border-radius: 10px;
+}

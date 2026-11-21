@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+action=${1:-}
+
+confirm() {
+    label=$1
+    zenity --question \
+        --title="$label" \
+        --text="Are you sure you want to $label?" \
+        --ok-label="$label" \
+        --cancel-label="Cancel" \
+        --width=360
+}
+
+case "$action" in
+    lock) loginctl lock-session ;;
+    logout) hyprctl dispatch 'hl.dsp.exit()' ;;
+    suspend) systemctl suspend ;;
+    reboot) confirm "restart" && systemctl reboot ;;
+    shutdown) confirm "shut down" && systemctl poweroff ;;
+    *) printf 'Usage: %s lock|logout|suspend|reboot|shutdown\n' "$0" >&2; exit 2 ;;
+esac

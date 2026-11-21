@@ -1,0 +1,5 @@
+#!/bin/sh
+
+agent=/usr/lib/polkit-kde-authentication-agent-1
+pgrep -u "$(id -u)" -f "^$agent$" >/dev/null 2>&1 && exit 0
+exec "$agent"

@@ -1,0 +1,10 @@
+[server]
+style = "/home/hosh/.config/swayosd/style.css"
+top_margin = 0.84
+max_volume = 100
+min_brightness = 5
+show_percentage = true
+keyboard_backlight = false
+duration = 900
+
+[client]

@@ -1,0 +1,32 @@
+#!/bin/sh
+set -eu
+
+if ! command -v hyprsunset >/dev/null 2>&1; then
+    notify-send -u low "Night light unavailable" "Install the stable hyprsunset package."
+    exit 1
+fi
+
+state_dir="${XDG_RUNTIME_DIR:-/tmp}/hyprland-ui"
+state_file="$state_dir/night-light"
+mkdir -p "$state_dir"
+
+if [ -e "$state_file" ]; then
+    hyprctl hyprsunset identity >/dev/null
+    rm -f "$state_file"
+    notify-send -a hyprsunset "Night light off" "Neutral color temperature restored."
+    exit 0
+fi
+
+if ! pgrep -u "$(id -u)" -x hyprsunset >/dev/null 2>&1; then
+    hyprsunset --temperature 4500 >/dev/null 2>&1 &
+    i=0
+    while [ "$i" -lt 20 ] && ! pgrep -u "$(id -u)" -x hyprsunset >/dev/null 2>&1; do
+        i=$((i + 1))
+        sleep 0.05
+    done
+else
+    hyprctl hyprsunset temperature 4500 >/dev/null
+fi
+
+touch "$state_file"
+notify-send -a hyprsunset "Night light on" "4500 K · Super+Ctrl+N to restore neutral color."

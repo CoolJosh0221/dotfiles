@@ -1,0 +1,7 @@
+#!/bin/sh
+
+data=$(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits 2>/dev/null) || exit 0
+[ -n "$data" ] || exit 0
+util=${data%%,*}
+temp=${data##*, }
+printf 'GPU %s%% %s°C\n' "$util" "$temp"

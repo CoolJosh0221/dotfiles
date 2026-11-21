@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+mode=${1:-region}
+pictures_dir=$(xdg-user-dir PICTURES 2>/dev/null || true)
+[ -n "$pictures_dir" ] || pictures_dir="$HOME/Pictures"
+output_dir="$pictures_dir/Screenshots"
+mkdir -p "$output_dir"
+output="$output_dir/$(date +'%Y-%m-%d_%H-%M-%S').png"
+
+case "$mode" in
+    region)
+        geometry=$(slurp) || exit 0
+        grim -g "$geometry" "$output"
+        ;;
+    full)
+        grim "$output"
+        ;;
+    annotate)
+        if ! command -v satty >/dev/null 2>&1; then
+            notify-send -u low "Screenshot annotation unavailable" "Install the stable satty package; quick region capture still works."
+            exit 1
+        fi
+        geometry=$(slurp) || exit 0
+        grim -g "$geometry" -t ppm - |
+            satty --filename - --output-filename "$output"
+        exit 0
+        ;;
+    *)
+        exit 2
+        ;;
+esac
+
+wl-copy --type image/png < "$output"
+notify-send -a Screenshot "Screenshot saved" "$output"

@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+case ${1:-} in
+    up) adjustment='+ 5' ;;
+    down) adjustment='- 5' ;;
+    *) exit 2 ;;
+esac
+
+if ! command -v ddcutil >/dev/null 2>&1 || ! find /dev -maxdepth 1 -name 'i2c-*' -print -quit | grep -q .; then
+    notify-send -u low "Monitor brightness unavailable" "DDC/CI needs the i2c-dev kernel interface; no system change was made."
+    exit 1
+fi
+
+# Single-monitor host; flock prevents repeated keys from overlapping DDC requests.
+exec flock -n /tmp/hypr-ddc-brightness.lock ddcutil setvcp 10 $adjustment --noverify

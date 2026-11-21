@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+command -v vicinae >/dev/null 2>&1 || exit 0
+vicinae ping >/dev/null 2>&1 && exit 0
+
+# Direct session startup avoids a restart-always user service outside Hyprland.
+exec vicinae server --replace

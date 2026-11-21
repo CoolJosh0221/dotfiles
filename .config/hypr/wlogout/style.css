@@ -1,0 +1,66 @@
+* {
+  font-family: "Hyprland UI", "JetBrainsMono Nerd Font";
+  font-size: 15px;
+  font-weight: 600;
+}
+
+window {
+  background: rgba(34, 36, 54, 0.64);
+}
+
+button {
+  color: #c8d3f5;
+  background-color: rgba(30, 32, 48, 0.92);
+  background-repeat: no-repeat;
+  background-position: center 38%;
+  background-size: 30%;
+  border: 1px solid rgba(68, 74, 115, 0.78);
+  border-radius: 20px;
+  margin: 22px;
+  padding: 128px 26px 28px;
+  box-shadow: 0 14px 32px rgba(17, 18, 29, 0.42);
+  text-shadow: none;
+  transition: all 140ms ease;
+}
+
+button:hover,
+button:focus {
+  color: #1e2030;
+  background-color: #82aaff;
+  border-color: #c099ff;
+  box-shadow: 0 0 24px rgba(130, 170, 255, 0.34);
+}
+
+button:active {
+  background-color: #c099ff;
+}
+
+#lock {
+  background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+}
+
+#suspend {
+  background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+}
+
+#logout {
+  background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+}
+
+#reboot {
+  background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+}
+
+#shutdown {
+  background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+}
+
+#reboot:hover,
+#reboot:focus {
+  background-color: #ffc777;
+}
+
+#shutdown:hover,
+#shutdown:focus {
+  background-color: #ff757f;
+}

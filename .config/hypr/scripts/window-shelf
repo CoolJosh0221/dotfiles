@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+case "${1:-toggle}" in
+	toggle)
+		hyprctl dispatch 'hl.dsp.workspace.toggle_special("minimized")'
+		;;
+	park)
+		hyprctl dispatch 'hl.dsp.window.move({ workspace = "special:minimized", follow = false })'
+		;;
+	*)
+		printf 'usage: %s [toggle|park]\n' "$0" >&2
+		exit 2
+		;;
+esac

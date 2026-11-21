@@ -1,0 +1,155 @@
+:root {
+  --mpris-album-art-icon-size: 72px;
+}
+
+* {
+  font-family: "Hyprland UI", "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  color: #c8d3f5;
+  outline: none;
+}
+
+notificationwindow,
+blankwindow {
+  background: transparent;
+}
+
+.control-center {
+  background: rgba(30, 32, 48, 0.94);
+  border: 1px solid rgba(130, 170, 255, 0.45);
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(17, 18, 29, 0.48);
+  padding: 10px;
+}
+
+.control-center-list {
+  background: transparent;
+}
+
+.control-center-list-placeholder {
+  color: #7a88cf;
+  padding: 28px;
+}
+
+.notification-row {
+  outline: none;
+  margin: 5px 0;
+}
+
+.notification-row:focus,
+.notification-row:hover {
+  background: transparent;
+}
+
+.notification-background {
+  padding: 5px 9px;
+  background: transparent;
+}
+
+.notification {
+  padding: 0;
+  background: rgba(34, 36, 54, 0.96);
+  border: 1px solid rgba(68, 74, 115, 0.72);
+  border-radius: 14px;
+  box-shadow: 0 7px 20px rgba(17, 18, 29, 0.36);
+}
+
+.notification-content {
+  padding: 12px 13px;
+  background: transparent;
+}
+
+.notification-default-action,
+.notification-action {
+  background: transparent;
+  border-radius: 12px;
+}
+
+.notification-default-action:hover {
+  background: rgba(47, 51, 77, 0.97);
+}
+
+.notification-action {
+  color: #82aaff;
+  border-top: 1px solid rgba(68, 74, 115, 0.58);
+}
+
+.notification-action:hover {
+  color: #1e2030;
+  background: #82aaff;
+}
+
+.summary {
+  color: #c8d3f5;
+  font-weight: 650;
+  font-size: 14px;
+}
+
+.time {
+  color: #7a88cf;
+  font-size: 11px;
+}
+
+.body {
+  color: #a9b8e8;
+}
+
+.close-button {
+  min-width: 22px;
+  min-height: 22px;
+  margin: 7px;
+  padding: 0;
+  color: #ff757f;
+  background: rgba(47, 51, 77, 0.90);
+  border-radius: 999px;
+}
+
+.close-button:hover {
+  color: #1e2030;
+  background: #ff757f;
+}
+
+.notification.critical {
+  border-color: rgba(255, 117, 127, 0.82);
+}
+
+.notification.low {
+  border-color: rgba(122, 136, 207, 0.50);
+}
+
+.widget-title,
+.widget-dnd,
+.widget-mpris {
+  margin: 5px 4px;
+  padding: 10px 12px;
+  background: rgba(47, 51, 77, 0.66);
+  border: 1px solid rgba(68, 74, 115, 0.62);
+  border-radius: 13px;
+}
+
+.widget-title > label {
+  color: #c8d3f5;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.widget-title > button,
+.widget-dnd > switch {
+  color: #82aaff;
+  background: rgba(30, 32, 48, 0.82);
+  border: 1px solid rgba(130, 170, 255, 0.42);
+  border-radius: 9px;
+  padding: 5px 10px;
+}
+
+.widget-title > button:hover,
+.widget-dnd > switch:checked {
+  color: #1e2030;
+  background: linear-gradient(100deg, #82aaff, #c099ff);
+}
+
+.widget-mpris-player {
+  padding: 8px;
+  background: rgba(30, 32, 48, 0.62);
+  border-radius: 11px;
+}

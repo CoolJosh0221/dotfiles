@@ -1,0 +1,3 @@
+[Default Applications]
+# Hyprland-only file manager; KDE keeps its own desktop-specific Dolphin default.
+inode/directory=thunar.desktop;

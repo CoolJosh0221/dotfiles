@@ -1,0 +1,62 @@
+[meta]
+name = "Tokyo Night Moon"
+description = "Tokyo Night Moon palette for the Hyprland workstation"
+variant = "dark"
+inherits = "vicinae-dark"
+
+[colors.core]
+background = "#222436"
+foreground = "#c8d3f5"
+secondary_background = "#1e2030"
+border = "#444a73"
+accent = "#82aaff"
+accent_foreground = "#1e2030"
+
+[colors.accents]
+blue = "#82aaff"
+cyan = "#86e1fc"
+purple = "#c099ff"
+magenta = "#c099ff"
+yellow = "#ffc777"
+orange = "#ffc777"
+red = "#ff757f"
+green = "#c3e88d"
+
+[colors.text]
+default = "#c8d3f5"
+muted = "#7a88cf"
+placeholder = "#7a88cf"
+danger = "#ff757f"
+success = "#c3e88d"
+selection = { background = "#82aaff", foreground = "#1e2030" }
+
+[colors.input]
+background = "#1e2030"
+border = "#444a73"
+border_focus = "#82aaff"
+border_error = "#ff757f"
+
+[colors.main_window]
+border = "#444a73"
+footer = { background = "#1e2030" }
+
+[colors.list.item.selection]
+background = "#2f334d"
+foreground = "#c8d3f5"
+secondary_background = "#444a73"
+secondary_foreground = "#c8d3f5"
+
+[colors.grid.item]
+background = "#1e2030"
+hover = { outline = "#82aaff" }
+selection = { outline = "#c099ff" }
+
+[colors.scrollbars]
+background = "#444a73"
+
+[colors.shortcut]
+border = "#444a73"
+
+[colors.loading]
+bar = "#82aaff"
+spinner = "#c099ff"

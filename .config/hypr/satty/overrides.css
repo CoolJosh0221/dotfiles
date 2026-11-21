@@ -1,0 +1,19 @@
+.outer_box,
+.toolbar {
+  color: #c8d3f5;
+  background-color: rgba(30, 32, 48, 0.96);
+}
+
+button:hover,
+togglebutton:hover,
+button:checked,
+togglebutton:checked {
+  color: #1e2030;
+  background: #82aaff;
+}
+
+entry {
+  color: #c8d3f5;
+  background: #222436;
+  border-color: #444a73;
+}
