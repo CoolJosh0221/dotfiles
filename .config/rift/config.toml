@@ -1,7 +1,7 @@
 [settings]
 # Keep animated movement with shorter ordinary transitions.
 animate = true
-animation_duration = 0.12
+animation_duration = 0.2
 animation_fps = 120.0
 default_disable = false
 
@@ -48,8 +48,8 @@ animate = true
 [settings.layout.scrolling.gestures]
 enabled = false
 invert_horizontal = true
-fingers = 5
-propagate_to_workspace_swipe = false
+fingers = 3
+propagate_to_workspace_swipe = true
 
 
 [settings.layout.stack]
@@ -79,6 +79,7 @@ active_label = "index"
 display_style = "layout"
 layout_folder = "~/.config/rift/layouts"
 show_fullscreen_indicator = true
+current_display_only = false
 
 
 [settings.ui.stack_line]
@@ -101,7 +102,7 @@ fade_enabled = false
 [settings.gestures]
 enabled = false
 consume_dock_swipe = true
-invert_horizontal_swipe = false
+invert_horizontal_swipe = true
 swipe_vertical_tolerance = 0.4
 skip_empty = true
 fingers = 3
@@ -133,11 +134,11 @@ workspace_names = []
 # windows can contain these words. Float other preferences windows manually
 # with Right Option + Space, or add an app-specific rule when needed.
 app_rules = [
-	{ app_id = "com.vitalsource.bookshelf", floating = false, focus = false, manage = false, title_substring = "Highlight Menu" },
+  { app_id = "com.vitalsource.bookshelf", floating = false, focus = false, manage = false, title_substring = "Highlight Menu" },
   { app_id = "com.apple.systempreferences", manage = false },
   { app_id = "com.apple.calculator", manage = false },
-	{ ax_subrole = "AXDialog", floating = true, focus = false },
-	{ ax_subrole = "AXSystemDialog", floating = true, focus = false }
+  { ax_subrole = "AXDialog", floating = true, focus = false },
+  { ax_subrole = "AXSystemDialog", floating = true, focus = false },
 ]
 
 
